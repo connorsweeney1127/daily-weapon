@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Daily Weapon</title>
+  <style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: Inter, Arial, sans-serif;
+    color: #f8fafc;
+    background:
+      radial-gradient(circle at top left, rgba(59,130,246,.35), transparent 30%),
+      radial-gradient(circle at top right, rgba(168,85,247,.25), transparent 30%),
+      linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 26px 34px;
+    background: rgba(2, 6, 23, 0.78);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(148,163,184,.22);
+    box-shadow: 0 10px 40px rgba(0,0,0,.35);
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 34px;
+    letter-spacing: -1px;
+  }
+
+  header p {
+    margin: 8px 0 0;
+    color: #cbd5e1;
+    font-size: 15px;
+  }
+
+  .container {
+    display: flex;
+    height: calc(100vh - 105px);
+    padding: 22px;
+    gap: 22px;
+  }
+
+  .sidebar {
+    width: 285px;
+    padding: 18px;
+    border-radius: 24px;
+    background: rgba(15, 23, 42, .72);
+    border: 1px solid rgba(148,163,184,.25);
+    box-shadow: 0 20px 55px rgba(0,0,0,.35);
+    backdrop-filter: blur(18px);
+  }
+
+  .sidebar button {
+    display: block;
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 13px 14px;
+    color: #e5e7eb;
+    background: linear-gradient(135deg, rgba(30,41,59,.95), rgba(51,65,85,.8));
+    border: 1px solid rgba(148,163,184,.18);
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all .18s ease;
+  }
+
+  .sidebar button:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    box-shadow: 0 10px 28px rgba(37,99,235,.32);
+  }
+
+  .main {
+    flex: 1;
+    padding: 2px 4px 20px;
+    overflow-y: auto;
+  }
+
+  h2 {
+    font-size: 30px;
+    margin: 4px 0 18px;
+    letter-spacing: -.7px;
+  }
+
+  h3 {
+    margin-top: 0;
+    font-size: 18px;
+  }
+
+  .card {
+    background: linear-gradient(135deg, rgba(30,41,59,.86), rgba(15,23,42,.74));
+    border: 1px solid rgba(148,163,184,.22);
+    box-shadow: 0 18px 45px rgba(0,0,0,.28);
+    backdrop-filter: blur(16px);
+    padding: 19px;
+    border-radius: 22px;
+    margin-bottom: 18px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 18px;
+    background: rgba(15,23,42,.62);
+  }
+
+  th {
+    background: rgba(2,6,23,.78);
+    color: #bfdbfe;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  th, td {
+    padding: 14px;
+    border-bottom: 1px solid rgba(148,163,184,.16);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  tr:hover td {
+    background: rgba(59,130,246,.08);
+  }
+
+  .high {
+    color: #fb7185;
+    font-weight: 900;
+  }
+
+  .medium {
+    color: #facc15;
+    font-weight: 900;
+  }
+
+  .low {
+    color: #4ade80;
+    font-weight: 900;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(148,163,184,.22);
+    background: rgba(15,23,42,.9);
+    color: white;
+    outline: none;
+  }
+
+  textarea {
+    min-height: 155px;
+    resize: vertical;
+  }
+
+  button,
+  button.small {
+    padding: 10px 13px;
+    border-radius: 12px;
+    border: 1px solid rgba(148,163,184,.25);
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(37,99,235,.22);
+  }
+
+  button:hover,
+  button.small:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 30px rgba(124,58,237,.35);
+  }
+
+  a {
+    color: #93c5fd;
+    font-weight: 700;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    background: rgba(2,6,23,.7);
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(148,163,184,.18);
+  }
+
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .kpi-card {
+    background: linear-gradient(135deg, rgba(37,99,235,.38), rgba(124,58,237,.28));
+    border: 1px solid rgba(147,197,253,.28);
+    border-radius: 20px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+
+  .kpi-card:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 18px 40px rgba(37,99,235,.32);
+  }
+
+  .kpi-label {
+    color: #bfdbfe;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-weight: 800;
+  }
+
+  .kpi-value {
+    margin-top: 8px;
+    font-size: 30px;
+    font-weight: 900;
+  }
+
+  .kpi-note {
+    margin-top: 6px;
+    color: #cbd5e1;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔥 Daily Weapon</h1>
+  <p>Your CRE prospecting system</p>
+</header>
+
+<div class="container">
+  <div class="sidebar">
+    <button onclick="show('home')">🏠 Daily Weapon HQ</button>
+    <button onclick="show('call')">📞 Call List</button>
+      <button onclick="show('pipeline')">📊 Pipeline Dashboard</button>
+      <button onclick="show('tasks')">🔥 Daily Tasks</button>
+      <button onclick="show('briefing')">🧠 Morning Briefing</button>
+      <button onclick="show('signals_auto')">⚡ Signal Inbox</button>
+    <button onclick="show('email')">✉️ Email Scripts</button>
+    <button onclick="show('tenants')">🏢 Tenants</button>
+    <button onclick="show('signals')">📰 Live Signals</button>
+    <button onclick="show('news')">📰 News Updates</button>
+    <button onclick="show('financial')">💰 Financial Analysis</button>
+  </div>
+
+  <div class="main" id="content">Loading...</div>
+</div>
+
+<script>
+let tenants = [];
+let matchedSignals = [];
+let callLog = JSON.parse(localStorage.getItem("callLog") || "{}");
+let pipeline = JSON.parse(localStorage.getItem("pipeline") || "{}");
+
+function score(t){
+  let s = 0;
+
+  const text = [
+    t["Tenant Company"],
+    t["AI Business Summary"],
+    t["AI Business Type"],
+    t["AI Expansion Signals"],
+    t["AI Broker Angle"],
+    t["Notes"],
+    t["Website"]
+  ].join(" ").toLowerCase();
+
+  if (t["Local Contact"]) s += 25;
+  if (t["Business Phone (Local Contact) (Contact)"] || t["Mobile Phone (Local Contact) (Contact)"]) s += 20;
+  if (t["Email"]) s += 15;
+  if (t["Website"]) s += 10;
+  if (t["Lease End Date"]) s += 20;
+
+  if (text.includes("expansion")) s += 25;
+  if (text.includes("new location")) s += 25;
+  if (text.includes("hiring")) s += 15;
+  if (text.includes("franchise")) s += 15;
+  if (text.includes("retail")) s += 10;
+  if (text.includes("medical")) s += 10;
+  if (text.includes("restaurant")) s += 10;
+  if (text.includes("service")) s += 8;
+
+  return s;
+}
+
+function savePipeline(){
+  localStorage.setItem("pipeline", JSON.stringify(pipeline));
+}
+
+function saveLog(){
+  localStorage.setItem("callLog", JSON.stringify(callLog));
+}
+
+fetch("data.json")
+  .then(r=>r.json())
+  .then(d=>{
+    tenants = d.map(t=>({...t, score:score(t)}))
+               .sort((a,b)=>b.score-a.score);
+    loadSignals();
+        show("home");
+  });
+
+function generateSignalEmail(signal){
+  return `Subject: Quick note on ${signal.tenant}
+
+Hi,
+
+I came across this signal and thought it may be relevant:
+
+"${signal.title}"
+
+I work in commercial real estate in Tampa and help tenants evaluate expansion, relocation, lease strategy, and market opportunities.
+
+Not sure if this is relevant right now, but if there is anything around growth, market positioning, or upcoming lease decisions, I would be happy to be a resource.
+
+Are you the right person to speak with, or is there someone else on your team I should connect with?
+
+Best,
+Connor`;
+}
+
+function addTestSignal(){
+  matchedSignals = [{
+    tenant: "National Waterproofing Supply",
+    title: "National Waterproofing Supply expansion opportunity in Tampa",
+    link: "https://www.google.com/search?q=National+Waterproofing+Supply+Tampa+expansion",
+    signalScore: 75,
+    priority: "HIGH"
+  }];
+  show("tasks");
+}
+
+function refreshSignals(){
+  loadSignals();
+  alert("Signals refreshed. Wait 2–3 seconds, then reopen Morning Briefing or Daily Tasks.");
+}
+
+function topDashboard(){
+  const total = tenants.length;
+  const high = tenants.filter(t => t.score >= 40).length;
+  const contacted = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Contacted").length;
+  const meetings = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting").length;
+  const deals = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal").length;
+  const signals = matchedSignals.length;
+
+  return `
+    <div class="kpi-strip">
+      <div class="kpi-card" onclick="show('tenants')">
+        <div class="kpi-label">CRM Tenants</div>
+        <div class="kpi-value">${total}</div>
+        <div class="kpi-note">Loaded from Excel</div>
+      </div>
+
+      <div class="kpi-card" onclick="show('call')">
+        <div class="kpi-label">High Priority</div>
+        <div class="kpi-value">${high}</div>
+        <div class="kpi-note">Best outreach targets</div>
+      </div>
+
+      <div class="kpi-card" onclick="show('pipeline')">
+        <div class="kpi-label">Contacted</div>
+        <div class="kpi-value">${contacted}</div>
+        <div class="kpi-note">Pipeline started</div>
+      </div>
+
+      <div class="kpi-card" onclick="show('pipeline')">
+        <div class="kpi-label">Meetings</div>
+        <div class="kpi-value">${meetings}</div>
+        <div class="kpi-note">Needs prep</div>
+      </div>
+
+      <div class="kpi-card" onclick="show('pipeline')">
+        <div class="kpi-label">Deals</div>
+        <div class="kpi-value">${deals}</div>
+        <div class="kpi-note">Push forward</div>
+      </div>
+
+      <div class="kpi-card" onclick="show('tasks')">
+        <div class="kpi-label">Live Signals</div>
+        <div class="kpi-value">${signals}</div>
+        <div class="kpi-note">News-matched tasks</div>
+      </div>
+    </div>
+  `;
+}
+
+function show(tab){
+  let c = document.getElementById("content");
+
+  if(tab==="home"){
+    const total = tenants.length;
+    const high = tenants.filter(t => t.score >= 40).length;
+    const contacted = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Contacted").length;
+    const meetings = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting").length;
+    const deals = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal").length;
+
+    c.innerHTML = `
+      <h2>🏠 Daily Weapon HQ</h2>
+
+      <div class="grid">
+        <div class="card">
+          <h3>CRM Tenants</h3>
+          <h1>${total}</h1>
+          <p>Total tenant records loaded from Excel.</p>
+        </div>
+
+        <div class="card">
+          <h3>High Priority Targets</h3>
+          <h1>${high}</h1>
+          <p>Best outreach candidates based on score.</p>
+        </div>
+
+        <div class="card">
+          <h3>Pipeline Started</h3>
+          <h1>${contacted}</h1>
+          <p>Tenants marked as contacted.</p>
+        </div>
+
+        <div class="card">
+          <h3>Meetings / Deals</h3>
+          <h1>${meetings + deals}</h1>
+          <p>Active opportunities moving forward.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🤖 Active Agents</h3>
+        <table>
+          <tr>
+            <th>Agent</th>
+            <th>Function</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>Tenant Research Agent</td>
+            <td>Reads CRM tenants and builds company intel.</td>
+            <td>Active</td>
+          </tr>
+          <tr>
+            <td>Deal Scoring Agent</td>
+            <td>Ranks tenants by contact info, lease timing, and opportunity signals.</td>
+            <td>Active</td>
+          </tr>
+          <tr>
+            <td>Outreach Agent</td>
+            <td>Creates tailored email and LinkedIn messaging.</td>
+            <td>Active</td>
+          </tr>
+          <tr>
+            <td>Signal Agent</td>
+            <td>Tracks news, permits, ownership changes, and market triggers.</td>
+            <td>In Progress</td>
+          </tr>
+          <tr>
+            <td>Financial Analyst Agent</td>
+            <td>Supports lease comparison and investment underwriting.</td>
+            <td>Draft Mode</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>🔥 Today’s Focus</h3>
+          <p>Start with high-priority tenant outreach, then follow-ups, then pipeline updates.</p>
+          <button onclick="show('tasks')">Open Daily Tasks</button>
+        </div>
+
+        <div class="card">
+          <h3>📩 Outreach Engine</h3>
+          <p>Generate email scripts for tenant prospects and signal-based outreach.</p>
+          <button onclick="show('email')">Open Email Scripts</button>
+        </div>
+      </div>
+    `;
+  }
+
+  if(tab==="call"){
+    let top = tenants.slice(0,25);
+
+    c.innerHTML = `
+      <h2>📞 Call List</h2>\n      
+
+<button onclick="exportCalls()">Export Call Log</button>
+      <table>
+        <tr>
+          <th>Tenant</th>
+          <th>Priority</th>
+          <th>Contact</th>
+          <th>Call</th>
+          <th>Follow-up</th>
+          <th>Notes</th><th>Stage</th>
+        </tr>
+
+        ${top.map((t,i)=>{
+          let log = callLog[t["Tenant Company"]] || {};
+
+          return `
+          <tr>
+            <td>${t["Tenant Company"]}</td>
+            <td>${t.score}</td>
+            <td>${t["Local Contact"]||""}</td>
+
+            <td>
+              <button class="small" onclick="markCalled('${t["Tenant Company"]}')">
+                ${log.called ? "✅ Called" : "Mark Called"}
+              </button>
+            </td>
+
+            <td>
+              <input type="date"
+                value="${log.followup||""}"
+                onchange="setFollow('${t["Tenant Company"]}', this.value)">
+            </td>
+
+            <td>
+              <textarea onchange="setNotes('${t["Tenant Company"]}', this.value)">
+${log.notes||""}</textarea>
+            </td>
+
+            <td>
+              <select onchange="setStage('${t["Tenant Company"]}', this.value)">
+                ${["Not Contacted","Contacted","Meeting","Deal","Dead"].map(s =>
+                  `<option ${pipeline[t["Tenant Company"]]==s ? "selected":""}>${s}</option>`
+                ).join("")}
+              </select>
+            </td>
+
+          </tr>
+          `
+        }).join("")}
+      </table>
+    `;
+  }
+
+  if(tab==="pipeline"){
+    const counts = {
+      "Not Contacted": 0,
+      "Contacted": 0,
+      "Meeting": 0,
+      "Deal": 0,
+      "Dead": 0
+    };
+
+    tenants.forEach(t => {
+      const name = t["Tenant Company"];
+      const stage = pipeline[name] || "Not Contacted";
+      counts[stage] = (counts[stage] || 0) + 1;
+    });
+
+    const total = tenants.length;
+    const active = counts["Contacted"] + counts["Meeting"] + counts["Deal"];
+    const conversion = total ? ((counts["Deal"] / total) * 100).toFixed(1) : 0;
+
+    c.innerHTML = `
+      <h2>📊 Pipeline Dashboard</h2>\n      
+
+      <div class="grid">
+        <div class="card"><h3>Total Tenants</h3><p>${total}</p></div>
+        <div class="card"><h3>Active Pipeline</h3><p>${active}</p></div>
+        <div class="card"><h3>Deals</h3><p>${counts["Deal"]}</p></div>
+        <div class="card"><h3>Conversion Rate</h3><p>${conversion}%</p></div>
+      </div>
+
+      <div class="card">
+        <h3>Pipeline by Stage</h3>
+        ${Object.keys(counts).map(stage => {
+          const pct = total ? (counts[stage] / total) * 100 : 0;
+          return `
+            <div style="margin-bottom:14px;">
+              <strong>${stage}: ${counts[stage]}</strong>
+              <div style="background:#334155; height:18px; border-radius:10px; overflow:hidden; margin-top:5px;">
+                <div style="background:#38bdf8; width:${pct}%; height:100%;"></div>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+
+      <div class="card">
+        <h3>Hot Opportunities</h3>
+        <table>
+          <tr>
+            <th>Tenant</th>
+            <th>Stage</th>
+            <th>Score</th>
+            <th>Contact</th>
+            <th>Next Step</th>
+          </tr>
+          ${tenants
+            .filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") !== "Dead")
+            .slice(0, 25)
+            .map(t => {
+              const stage = pipeline[t["Tenant Company"]] || "Not Contacted";
+              return `
+                <tr>
+                  <td>${t["Tenant Company"] || ""}</td>
+                  <td>${stage}</td>
+                  <td>${t.score}</td>
+                  <td>${t["Local Contact"] || ""}</td>
+                  <td>${stage === "Not Contacted" ? "Call / LinkedIn" : stage === "Contacted" ? "Follow up" : stage === "Meeting" ? "Prepare proposal" : stage === "Deal" ? "Move to execution" : "No action"}</td>
+                </tr>
+              `;
+            }).join("")}
+        </table>
+      </div>
+    `;
+  }
+
+  if(tab==="tasks"){
+    const today = new Date().toISOString().split("T")[0];
+
+    let calls = [];
+    let followups = [];
+    let meetings = [];
+    let deals = [];
+
+    tenants.forEach(t => {
+      const name = t["Tenant Company"];
+      const stage = pipeline[name] || "Not Contacted";
+      const log = callLog[name] || {};
+
+      if(stage === "Not Contacted" && t.score >= 40){
+        calls.push(t);
+      }
+
+      if(log.followup === today){
+        followups.push(t);
+      }
+
+      if(stage === "Meeting"){
+        meetings.push(t);
+      }
+
+      if(stage === "Deal"){
+        deals.push(t);
+      }
+    });
+
+    c.innerHTML = `
+      <h2>🔥 Daily Task Engine</h2>\n      
+
+      <div class="card">
+        <h3>⚡ Signal-Based Email Tasks</h3>
+        <button class="small" onclick="refreshSignals()">Refresh Signals</button>
+        <button class="small" onclick="addTestSignal()">Test Signal</button>
+
+        ${
+          matchedSignals.length
+            ? matchedSignals.map(s => `
+              <div class="card">
+                <p>📩 <strong>EMAIL NOW:</strong> ${s.tenant}</p>
+                <p><strong>Signal Score:</strong> ${s.signalScore || 0} (${s.priority || "LOW"})</p>
+                <p><strong>Reason:</strong> ${s.title}</p>
+                <a href="${s.link}" target="_blank">Open signal</a>
+
+                <h4>Email Draft</h4>
+                <textarea readonly>${generateSignalEmail(s)}</textarea>
+              </div>
+            `).join("")
+            : "<p>No matched signals yet. Click Test Signal to verify this works.</p>"
+        }
+      </div>
+
+      <div class="card">
+        <h3>⚡ Signal-Based Tasks (${matchedSignals.length})</h3>
+
+        <div class="card">
+          <h3>🔥 HIGH PRIORITY CALLS (from signals)</h3>
+          ${
+            matchedSignals.filter(s => s.priority === "HIGH").length
+              ? matchedSignals
+                  .filter(s => s.priority === "HIGH")
+                  .map(s => `
+                    <p>
+                      📩 <strong>EMAIL NOW:</strong> ${s.tenant}<br>
+                      Signal Score: ${s.signalScore} (${s.priority})<br>
+                      Reason: ${s.title}<br>
+                      <a href="${s.link}" target="_blank">Open signal</a>
+                    </p>
+                  `).join("")
+              : "<p>No high-priority signals yet.</p>"
+          }
+        </div>
+
+<div class="card">
+  <h3>🔥 HIGH PRIORITY CALLS (from signals)</h3>
+  ${
+    matchedSignals.filter(s => s.priority === "HIGH").length
+    ? matchedSignals
+        .filter(s => s.priority === "HIGH")
+        .map(s => `
+          <p>
+            📩 <strong>EMAIL NOW:</strong> ${s.tenant}<br>
+            Reason: ${s.title}<br>
+            Score: ${s.signalScore}
+          </p>
+        `).join("")
+    : "<p>No high-priority signals yet.</p>"
+  }
+</div>
+        <button class="small" onclick="refreshSignals()">Refresh Signals</button>
+        ${matchedSignals.length ? matchedSignals.map(s => `
+          <p>
+            <strong>${s.tenant}</strong><br>
+            Signal Score: ${s.signalScore} (${s.priority})<br>
+            Reason: ${s.title}<br>
+            <a href="${s.link}" target="_blank">Open signal</a>
+          </p>
+        `).join("") : "<p>No matched live signals yet.</p>"}
+      </div>
+
+      <div class="card">
+        <h3>🔥 Calls to Make (${calls.length})</h3>
+        ${calls.map(t => `<p>${t["Tenant Company"]} (${t.score})</p>`).join("")}
+      </div>
+
+      <div class="card">
+        <h3>⏰ Follow Ups Today (${followups.length})</h3>
+        ${followups.map(t => `<p>${t["Tenant Company"]}</p>`).join("")}
+      </div>
+
+      <div class="card">
+        <h3>🤝 Meetings to Prep (${meetings.length})</h3>
+        ${meetings.map(t => `<p>${t["Tenant Company"]}</p>`).join("")}
+      </div>
+
+      <div class="card">
+        <h3>🚀 Deals to Push (${deals.length})</h3>
+        ${deals.map(t => `<p>${t["Tenant Company"]}</p>`).join("")}
+      </div>
+    `;
+  }
+
+  if(tab==="briefing"){
+    const today = new Date().toISOString().split("T")[0];
+
+    const topCalls = tenants
+      .filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Not Contacted")
+      .slice(0, 10);
+
+    const followups = tenants.filter(t => {
+      const log = callLog[t["Tenant Company"]] || {};
+      return log.followup === today;
+    });
+
+    const meetings = tenants.filter(t =>
+      (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting"
+    );
+
+    const deals = tenants.filter(t =>
+      (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal"
+    );
+
+    c.innerHTML = `
+      <h2>🧠 Morning Briefing</h2>\n      
+
+      <div class="card">
+        <h3>Today’s Mission</h3>
+        <p>Focus on high-score tenants, follow-ups due today, active meeting/deal-stage opportunities, and any fresh tenant/news signals.</p>
+      </div>
+
+      <div class="card">
+        <h3>⚡ New Matched Signals</h3>
+        <button class="small" onclick="refreshSignals()">Refresh Signals</button>
+        ${matchedSignals.length ? matchedSignals.slice(0,10).map(s => `
+          <p>
+            <strong>${s.tenant}</strong> — Score: ${s.signalScore} (${s.priority})<br>
+            ${s.title}<br>
+            <a href="${s.link}" target="_blank">Open article</a>
+          </p>
+        `).join("") : "<p>No matched signals loaded yet. Check Signal Inbox or refresh.</p>"}
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>🔥 Top Calls</h3>
+          <p>${topCalls.length} priority calls queued.</p>
+        </div>
+
+        <div class="card">
+          <h3>⏰ Follow-Ups Due</h3>
+          <p>${followups.length} follow-ups due today.</p>
+        </div>
+
+        <div class="card">
+          <h3>🤝 Meetings</h3>
+          <p>${meetings.length} meeting-stage opportunities.</p>
+        </div>
+
+        <div class="card">
+          <h3>🚀 Deals</h3>
+          <p>${deals.length} deal-stage opportunities.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Top 10 Calls Today</h3>
+        <ol>
+          ${topCalls.map(t => `
+            <li>
+              <strong>${t["Tenant Company"]}</strong>
+              — Score: ${t.score}
+              — ${t["Address"] || ""}
+            </li>
+          `).join("")}
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3>Execution Plan</h3>
+        <ol>
+          <li>Call the top 10 tenants first.</li>
+          <li>Handle every follow-up due today.</li>
+          <li>Prep meeting-stage opportunities.</li>
+          <li>Move deal-stage opportunities forward.</li>
+          <li>Log notes and set the next follow-up date.</li>
+        </ol>
+      </div>
+    `;
+  }
+
+  if(tab==="signals_auto"){
+    c.innerHTML = `
+      <h2>⚡ Signal Inbox</h2>\n      
+      <div class="card">
+        <p>Pulling latest business + CRE signals…</p>
+      </div>
+      <div id="signalsList"></div>
+    `;
+
+    fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent("https://news.google.com/rss/search?q=tampa+real+estate+tenant+expansion"))
+      .then(res => res.text())
+      .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+      .then(data => {
+        const items = [...data.querySelectorAll("item")].slice(0, 15);
+
+        document.getElementById("signalsList").innerHTML =
+          '<div class="card">' +
+          items.map(i => `
+            <p>
+              <a href="${i.querySelector("link").textContent}" target="_blank">
+                ${i.querySelector("title").textContent}
+              </a>
+            </p>
+          `).join("") +
+          '</div>';
+      })
+      .catch(() => {
+        document.getElementById("signalsList").innerHTML =
+          "<div class='card'>Unable to load signals (CORS limit). Still use manual links in Live Signals tab.</div>";
+      });
+  }
+
+  if(tab==="email"){
+    c.innerHTML = `
+      <h2>✉️ Email Script</h2>\n      
+      <select onchange="genEmail(this.value)">
+        ${tenants.map((t,i)=>`<option value="${i}">${t["Tenant Company"]}</option>`).join("")}
+      </select>
+
+      <textarea id="emailBox"></textarea>
+    `;
+    genEmail(0);
+  }
+
+  if(tab==="tenants"){
+    c.innerHTML = `
+      <h2>🏢 Tenants</h2>\n      
+      <p>${tenants.length} loaded</p>
+    `;
+  }
+
+  if(tab==="signals"){
+    c.innerHTML = `
+      <h2>📰 Live Signals</h2>\n      
+
+      <div class="card">
+        <h3>Daily News Sources</h3>
+        <p><a target="_blank" href="https://www.wsj.com/news/business">Wall Street Journal — Business</a></p>
+        <p><a target="_blank" href="https://www.wsj.com/news/realestate">Wall Street Journal — Real Estate</a></p>
+        <p><a target="_blank" href="https://www.bizjournals.com/tampabay/">Tampa Bay Business Journal</a></p>
+        <p><a target="_blank" href="https://www.tampabay.com/news/business/">Tampa Bay Times — Business</a></p>
+      </div>
+
+      <div class="card">
+        <h3>Permits + Public Records</h3>
+        <p><a target="_blank" href="https://app.hillsboroughcounty.org/DevelopmentServices/PermitReports">Hillsborough County Permit Reports</a></p>
+        <p><a target="_blank" href="https://aca-prod.accela.com/HCFL/Cap/CapHome.aspx?module=Building">HillsGovHub / Accela Building Records</a></p>
+        <p><a target="_blank" href="https://www.hcpafl.org/">Hillsborough County Property Appraiser</a></p>
+        <p><a target="_blank" href="https://publicaccess.hillsclerk.com/oripublicaccess/">Hillsborough Clerk Official Records</a></p>
+      </div>
+
+      <div class="card">
+        <h3>How to Use This Daily</h3>
+        <ul>
+          <li>Check WSJ for one macro/business article.</li>
+          <li>Check Tampa Bay Business Journal for local CRE movement.</li>
+          <li>Check permit reports for new construction or tenant buildouts.</li>
+          <li>Check property appraiser / official records for ownership changes.</li>
+          <li>Use any signal as your reason to call.</li>
+        </ul>
+      </div>
+    `;
+  }
+
+  if(tab==="news"){
+    c.innerHTML = `
+      <h2>📰 News Updates</h2>\n      
+
+      <div class="card">
+        <h3>Daily CRE / Tenant News</h3>
+        <p>This will eventually pull WSJ, local Tampa CRE news, permits, ownership changes, and tenant-specific expansion signals.</p>
+      </div>
+
+      <div class="card">
+        <h3>Daily Must-Check Sources</h3>
+        <ul>
+          <li>Wall Street Journal — CRE / business article</li>
+          <li>Tampa Bay Business Journal</li>
+          <li>Hillsborough County permits</li>
+          <li>Property appraiser ownership changes</li>
+          <li>Tenant hiring / expansion announcements</li>
+        </ul>
+      </div>
+    `;
+  }
+
+  if(tab==="financial"){
+    c.innerHTML = `
+      <h2>💰 Financial Analysis</h2>\n      
+
+      <div class="card">
+        <h3>📊 Full Financial Model</h3>
+        <button onclick="openModel()">Open Financial Model</button>
+      </div>
+
+      <div class="card">
+        <h3>Investment Underwriting</h3>
+
+        <label>Purchase Price</label>
+        <input id="price">
+
+        <label>NOI</label>
+        <input id="noi">
+
+        <label>Loan % (LTV)</label>
+        <input id="ltv" placeholder="Example: 70">
+
+        <label>Interest Rate (%)</label>
+        <input id="rate" placeholder="Example: 6.5">
+
+        <label>Amortization (years)</label>
+        <input id="amort" placeholder="Example: 25">
+
+        <button class="small" onclick="calcDeal()">Analyze Deal</button>
+
+        <pre id="dealOut"></pre>
+      </div>
+
+      <div class="card">
+        <h3>Lease Comparison</h3>
+
+        <label>Size (SF)</label>
+        <input id="sf">
+
+        <label>Base Rent ($/SF)</label>
+        <input id="rent">
+
+        <label>NNN ($/SF)</label>
+        <input id="nnn">
+
+        <label>Term (years)</label>
+        <input id="term">
+
+        <label>Free Rent (months)</label>
+        <input id="free">
+
+        <label>TI Allowance ($/SF)</label>
+        <input id="ti">
+
+        <button class="small" onclick="calcLease()">Analyze Lease</button>
+
+        <pre id="leaseOut"></pre>
+      </div>
+    `;
+  }
+}
+
+function markCalled(name){
+  callLog[name] = callLog[name] || {};
+  callLog[name].called = true;
+  saveLog();
+  loadSignals();
+        show("home");
+}
+
+function setFollow(name,date){
+  callLog[name] = callLog[name] || {};
+  callLog[name].followup = date;
+  saveLog();
+}
+
+function setNotes(name,val){
+  callLog[name] = callLog[name] || {};
+  callLog[name].notes = val;
+  saveLog();
+}
+
+function calculateInvestment(){
+  const price = Number(document.getElementById("purchasePrice").value);
+  const noi = Number(document.getElementById("noi").value);
+
+  if(!price || !noi){
+    document.getElementById("investmentResult").innerText = "Enter purchase price and NOI.";
+    return;
+  }
+
+  const capRate = (noi / price) * 100;
+  document.getElementById("investmentResult").innerText =
+    "Cap Rate: " + capRate.toFixed(2) + "%";
+}
+
+function compareLeases(){
+  const a = Number(document.getElementById("rentA").value);
+  const b = Number(document.getElementById("rentB").value);
+
+  if(!a || !b){
+    document.getElementById("leaseResult").innerText = "Enter both rent options.";
+    return;
+  }
+
+  const winner = a < b ? "Option A is cheaper" : "Option B is cheaper";
+  const savings = Math.abs(a - b);
+
+  document.getElementById("leaseResult").innerText =
+    winner + " by $" + savings.toLocaleString() + " per year.";
+}
+
+function openModel(){
+  window.open("Daily_Weapon_Financial_Model.xlsx", "_blank");
+}
+
+function calcDeal(){
+  const price = Number(document.getElementById("price").value);
+  const noi = Number(document.getElementById("noi").value);
+  const ltv = Number(document.getElementById("ltv").value)/100;
+  const rate = Number(document.getElementById("rate").value)/100;
+  const amort = Number(document.getElementById("amort").value);
+
+  if(!price || !noi){
+    document.getElementById("dealOut").innerText = "Missing inputs";
+    return;
+  }
+
+  const loan = price * ltv;
+  const equity = price - loan;
+
+  const monthlyRate = rate/12;
+  const payments = amort*12;
+
+  const debtService =
+    loan * (monthlyRate*(1+monthlyRate)**payments) /
+    ((1+monthlyRate)**payments - 1) * 12;
+
+  const cashFlow = noi - debtService;
+  const coc = (cashFlow / equity) * 100;
+  const cap = (noi / price) * 100;
+
+  document.getElementById("dealOut").innerText =
+`Cap Rate: ${cap.toFixed(2)}%
+Loan: $${loan.toLocaleString()}
+Annual Debt Service: $${debtService.toFixed(0)}
+Cash Flow: $${cashFlow.toFixed(0)}
+Cash-on-Cash: ${coc.toFixed(2)}%`;
+}
+
+function calcLease(){
+  const sf = Number(document.getElementById("sf").value);
+  const rent = Number(document.getElementById("rent").value);
+  const nnn = Number(document.getElementById("nnn").value);
+  const term = Number(document.getElementById("term").value);
+  const free = Number(document.getElementById("free").value);
+  const ti = Number(document.getElementById("ti").value);
+
+  if(!sf || !rent){
+    document.getElementById("leaseOut").innerText = "Missing inputs";
+    return;
+  }
+
+  const annual = sf * (rent + nnn);
+  const total = annual * term;
+
+  const freeValue = (annual/12) * free;
+  const tiValue = sf * ti;
+
+  const effective = (total - freeValue - tiValue) / term;
+
+  document.getElementById("leaseOut").innerText =
+`Annual Rent: $${annual.toLocaleString()}
+Total Lease Value: $${total.toLocaleString()}
+Free Rent Value: $${freeValue.toFixed(0)}
+TI Value: $${tiValue.toFixed(0)}
+Effective Annual Rent: $${effective.toFixed(0)}`;
+}
+
+function exportCalls(){
+  let rows = [["Tenant","Called","Follow Up","Notes"]];
+
+  Object.keys(callLog).forEach(k=>{
+    let v = callLog[k];
+    rows.push([
+      k,
+      v.called ? "Yes" : "No",
+      v.followup || "",
+      (v.notes || "").replace(/\n/g," ")
+    ]);
+  });
+
+  let csv = rows.map(r=>r.join(",")).join("\n");
+  let blob = new Blob([csv], { type: "text/csv" });
+
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "call_log.csv";
+  a.click();
+}
+
+function genEmail(i){
+  let t = tenants[i];
+  document.getElementById("emailBox").value =
+`Subject: Quick question
+
+Hi,
+
+I came across ${t["Tenant Company"]} and wanted to ask who handles real estate decisions.
+
+I help tenants with expansion + lease strategy in Tampa.
+
+Worth a quick call?
+
+Connor`;
+}
+</script>
+
+</body>
+</html>

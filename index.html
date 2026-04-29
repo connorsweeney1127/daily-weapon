@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Daily Weapon 💵</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #f8fafc;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.35), transparent 30%),
+        radial-gradient(circle at top right, rgba(124,58,237,.30), transparent 30%),
+        linear-gradient(135deg, #020617, #0f172a 45%, #111827);
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 28px 34px;
+      background: rgba(2,6,23,.75);
+      border-bottom: 1px solid rgba(148,163,184,.22);
+      backdrop-filter: blur(18px);
+    }
+
+    h1 { margin: 0; font-size: 38px; letter-spacing: -1px; }
+    h2 { margin: 0 0 14px; font-size: 24px; }
+    h3 { margin: 0 0 10px; }
+
+    .page {
+      padding: 24px;
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(30,41,59,.88), rgba(15,23,42,.74));
+      border: 1px solid rgba(148,163,184,.25);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.28);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        linear-gradient(135deg, rgba(37,99,235,.55), rgba(124,58,237,.35)),
+        rgba(15,23,42,.8);
+    }
+
+    .metric {
+      cursor: pointer;
+      transition: .18s ease;
+      min-height: 125px;
+    }
+
+    .metric:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 38px rgba(37,99,235,.35);
+    }
+
+    .label {
+      font-size: 12px;
+      color: #bfdbfe;
+      text-transform: uppercase;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .value {
+      font-size: 34px;
+      font-weight: 900;
+      margin-top: 8px;
+    }
+
+    .note {
+      color: #cbd5e1;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border-radius: 18px;
+      background: rgba(15,23,42,.62);
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(148,163,184,.16);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      background: rgba(2,6,23,.85);
+      color: #bfdbfe;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    tr:hover td { background: rgba(59,130,246,.08); }
+
+    button {
+      padding: 10px 13px;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,.25);
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      margin: 4px 4px 4px 0;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    textarea, input, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,.22);
+      background: rgba(15,23,42,.9);
+      color: white;
+      margin: 8px 0 12px;
+    }
+
+    textarea { min-height: 150px; }
+
+    .agent {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px;
+      border-radius: 16px;
+      background: rgba(30,41,59,.75);
+      border: 1px solid rgba(148,163,184,.18);
+      margin-bottom: 10px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      background: rgba(37,99,235,.35);
+      color: #bfdbfe;
+    }
+
+    .high { color: #fb7185; font-weight: 900; }
+    .medium { color: #facc15; font-weight: 900; }
+    .low { color: #4ade80; font-weight: 900; }
+
+    a { color: #93c5fd; font-weight: 800; }
+
+    .section { margin-bottom: 18px; }
+  
+    .preview-scroll {
+      max-height: 420px;
+      overflow-y: auto;
+      overflow-x: auto;
+      border-radius: 18px;
+    }
+
+    .jump-button {
+      margin-bottom: 12px;
+    }
+
+    .good-score { color:#4ade80; font-weight:900; }
+    .okay-score { color:#fb923c; font-weight:900; }
+    .bad-score { color:#f87171; font-weight:900; }
+
+    .market-intel-card {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      text-align: center !important;
+      min-height: 360px;
+    }
+
+    .market-intel-card .metric-row {
+      width: 100%;
+      align-items: stretch;
+      margin-top: 18px !important;
+    }
+</style>
+</head>
+
+<body>
+  <header onclick="openSchedule()" style="cursor:pointer;">
+    <h1>Daily Weapon 💵</h1>
+    <p>Connor's Master CRM — Built For Closers</p>
+  </header>
+
+  <div class="page">
+    <div id="app">Loading Daily Weapon 💵</div>
+  </div>
+
+  <script>
+    let tenants = [];
+    let matchedSignals = [];
+    let callLog = JSON.parse(localStorage.getItem("callLog") || "{}");
+    let pipeline = JSON.parse(localStorage.getItem("pipeline") || "{}");
+
+    function saveLog(){ localStorage.setItem("callLog", JSON.stringify(callLog)); }
+    function savePipeline(){ localStorage.setItem("pipeline", JSON.stringify(pipeline)); }
+
+    function clean(v){ return v || ""; }
+
+    function score(t){
+      let s = 0;
+      const text = [
+        t["Tenant Company"], t["AI Business Summary"], t["AI Business Type"],
+        t["AI Expansion Signals"], t["AI Broker Angle"], t["Notes"], t["Website"]
+      ].join(" ").toLowerCase();
+
+      if (t["Local Contact"]) s += 25;
+      if (t["Business Phone (Local Contact) (Contact)"] || t["Mobile Phone (Local Contact) (Contact)"]) s += 20;
+      if (t["Email"]) s += 15;
+      if (t["Website"]) s += 10;
+      if (t["Lease End Date"]) s += 20;
+      if (text.includes("expansion")) s += 25;
+      if (text.includes("new location")) s += 25;
+      if (text.includes("hiring")) s += 15;
+      if (text.includes("franchise")) s += 15;
+      if (text.includes("retail")) s += 10;
+      if (text.includes("medical")) s += 10;
+      if (text.includes("restaurant")) s += 10;
+      if (text.includes("service")) s += 8;
+
+      return s;
+    }
+
+    function scoreLabel(score){
+      if(score >= 90) return "🟢 Good";
+      if(score >= 50) return "🟠 Okay";
+      return "🔴 Bad";
+    }
+
+    function scoreClass(score){
+      if(score >= 90) return "good-score";
+      if(score >= 50) return "okay-score";
+      return "bad-score";
+    }
+
+    function level(score){
+      if(score >= 70) return "high";
+      if(score >= 40) return "medium";
+      return "low";
+    }
+
+    function scoreSignal(title) {
+      const text = title.toLowerCase();
+      let score = 0;
+      if (text.includes("expansion")) score += 30;
+      if (text.includes("new location")) score += 30;
+      if (text.includes("opening")) score += 25;
+      if (text.includes("lease")) score += 20;
+      if (text.includes("acquires") || text.includes("acquisition")) score += 20;
+      if (text.includes("permits") || text.includes("permit")) score += 20;
+      if (text.includes("tampa")) score += 15;
+      if (text.includes("florida")) score += 10;
+      if (text.includes("hiring")) score += 10;
+      return score;
+    }
+
+    function signalPriority(score) {
+      if (score >= 50) return "HIGH";
+      if (score >= 25) return "MEDIUM";
+      return "LOW";
+    }
+
+    function generateSignalEmail(signal){
+      return `Subject: Quick note on ${signal.tenant}
+
+Hi,
+
+I came across this recently and thought of you:
+
+"${signal.title}"
+
+I work in commercial real estate in Tampa and help tenants think through expansion, relocation, and lease strategy.
+
+Not sure if this is relevant on your end, but if there is anything around growth, market positioning, or upcoming lease decisions, I would be happy to share what I am seeing in the market.
+
+Are you the right person to speak with, or is there someone else on your team I should connect with?
+
+Best,
+Connor`;
+    }
+
+    function generateEmail(t) {
+      const tenant = clean(t["Tenant Company"]);
+      const contact = clean(t["Local Contact"]) || "there";
+      const address = clean(t["Address"]);
+      const leaseEnd = clean(t["Lease End Date"]);
+
+      return `Subject: Quick question on ${tenant}
+
+Hi ${contact},
+
+I work in commercial real estate in the Tampa market and came across ${tenant}${address ? " at " + address : ""}.
+
+I help tenants evaluate lease options, expansion opportunities, relocations, and market positioning. ${leaseEnd ? "I also noticed a lease date around " + leaseEnd + ", so timing may be worth reviewing." : ""}
+
+Are you the right person to speak with about real estate decisions for ${tenant}, or is there someone else I should connect with?
+
+Best,
+Connor`;
+    }
+
+    function addTestSignal(){
+      matchedSignals = [{
+        tenant: "National Waterproofing Supply",
+        title: "National Waterproofing Supply expansion opportunity in Tampa",
+        link: "https://www.google.com/search?q=National+Waterproofing+Supply+Tampa+expansion",
+        signalScore: 75,
+        priority: "HIGH"
+      }];
+      render();
+    }
+
+    function refreshSignals(){
+      matchedSignals = [];
+      fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent("https://news.google.com/rss/search?q=tampa+commercial+real+estate+tenant+expansion"))
+        .then(res => res.text())
+        .then(str => new DOMParser().parseFromString(str, "text/xml"))
+        .then(data => {
+          const items = [...data.querySelectorAll("item")].slice(0, 25);
+          items.forEach(i => {
+            const title = i.querySelector("title")?.textContent || "";
+            const link = i.querySelector("link")?.textContent || "";
+            tenants.forEach(t => {
+              const tenant = (t["Tenant Company"] || "").toLowerCase();
+              if(!tenant || tenant.length < 4) return;
+              const words = tenant.replace(/[^a-z0-9 ]/g, "").split(" ").filter(w => w.length > 3);
+              const simpleTitle = title.toLowerCase().replace(/[^a-z0-9 ]/g, "");
+              const matches = words.filter(w => simpleTitle.includes(w)).length;
+              if(matches >= Math.min(2, words.length)) {
+                const signalScore = scoreSignal(title);
+                matchedSignals.push({
+                  tenant: t["Tenant Company"],
+                  title, link, signalScore,
+                  priority: signalPriority(signalScore)
+                });
+              }
+            });
+          });
+          matchedSignals.sort((a,b) => b.signalScore - a.signalScore);
+          render();
+        })
+        .catch(() => {
+          alert("Could not load live signals right now. Test Signal still works.");
+        });
+    }
+
+    function setStage(name, stage){
+      pipeline[name] = stage;
+      savePipeline();
+      render();
+    }
+
+    function markCalled(name){
+      callLog[name] = callLog[name] || {};
+      callLog[name].called = true;
+      saveLog();
+      render();
+    }
+
+    function setFollow(name, date){
+      callLog[name] = callLog[name] || {};
+      callLog[name].followup = date;
+      saveLog();
+    }
+
+    function setNotes(name, val){
+      callLog[name] = callLog[name] || {};
+      callLog[name].notes = val;
+      saveLog();
+    }
+
+    function scrollToPipeline(){
+      document.getElementById("pipelineTracker").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function openLinkedIn(company){
+      const query = encodeURIComponent(company + " Tampa owner president founder operations real estate");
+      window.open("https://www.linkedin.com/search/results/people/?keywords=" + query, "_blank");
+    }
+
+    function openMarketData(){
+      alert("Market Data module coming next: rent trends, vacancy, cap rates, and market reports.");
+    }
+
+    function openDemandDrivers(){
+      alert("Industrial Demand Drivers module coming next: logistics, 3PL growth, manufacturing, port activity, infrastructure, and reshoring signals.");
+    }
+
+    function openPermits(){
+      window.open("https://app.hillsboroughcounty.org/DevelopmentServices/PermitReports", "_blank");
+    }
+
+    function openDailyNews(){
+      window.open("https://www.bizjournals.com/tampabay/", "_blank");
+      window.open("https://www.wsj.com/news/realestate", "_blank");
+    }
+
+    function openCompData(){
+      alert("Comp Data module coming next: lease comps, sale comps, and market reports.");
+    }
+
+    function openSchedule(){
+      alert("Schedule module coming next. We can connect Google Calendar or task system here.");
+    }
+
+    function openModel(){
+      window.open("Daily_Weapon_Financial_Model.xlsx", "_blank");
+    }
+
+    function parseLeaseDate(value){
+      if(!value) return null;
+
+      const text = String(value).trim();
+      const parsed = new Date(text);
+
+      if(!isNaN(parsed)) return parsed;
+
+      const months = {
+        jan:0, january:0,
+        feb:1, february:1,
+        mar:2, march:2,
+        apr:3, april:3,
+        may:4,
+        jun:5, june:5,
+        jul:6, july:6,
+        aug:7, august:7,
+        sep:8, sept:8, september:8,
+        oct:9, october:9,
+        nov:10, november:10,
+        dec:11, december:11
+      };
+
+      const parts = text.toLowerCase().replace(",", "").split(/\s+/);
+      const month = months[parts[0]];
+      const year = parts.find(p => /^20\d{2}$/.test(p));
+
+      if(month !== undefined && year) {
+        return new Date(Number(year), month, 1);
+      }
+
+      return null;
+    }
+
+    function contactScore(t){
+      let s = 0;
+      if(t["Local Contact"]) s += 40;
+      if(t["Business Phone (Local Contact) (Contact)"]) s += 25;
+      if(t["Mobile Phone (Local Contact) (Contact)"]) s += 25;
+      if(t["Email"]) s += 20;
+      if(t["Website"]) s += 10;
+      return s;
+    }
+
+    function pipelineSort(a,b){
+      const cutoff = new Date(2028, 0, 1);
+
+      const aDate = parseLeaseDate(a["Lease End Date"]);
+      const bDate = parseLeaseDate(b["Lease End Date"]);
+
+      const aUrgent = aDate && aDate <= cutoff;
+      const bUrgent = bDate && bDate <= cutoff;
+
+      if(aUrgent && bUrgent){
+        return aDate - bDate || contactScore(b) - contactScore(a);
+      }
+
+      if(aUrgent && !bUrgent) return -1;
+      if(!aUrgent && bUrgent) return 1;
+
+      return contactScore(b) - contactScore(a);
+    }
+
+    function swapAgentsAndMarket(){
+      const cards = [...document.querySelectorAll(".card")];
+
+      const marketCard = cards.find(card =>
+        card.innerText.includes("Market Intelligence")
+      );
+
+      const agentCard = cards.find(card =>
+        card.innerText.includes("Active Agents")
+      );
+
+      if(marketCard && agentCard){
+        const marketClone = marketCard.cloneNode(true);
+        const agentClone = agentCard.cloneNode(true);
+
+        marketCard.replaceWith(agentClone);
+        agentCard.replaceWith(marketClone);
+      }
+    }
+
+    function swapMarketAndSignals(){
+      const cards = [...document.querySelectorAll(".card")];
+
+      const marketCard = cards.find(card =>
+        card.innerText.includes("Market Intelligence")
+      );
+
+      const signalCard = cards.find(card =>
+        card.innerText.includes("Signal-Based Leads")
+      );
+
+      if(marketCard && signalCard){
+        const marketClone = marketCard.cloneNode(true);
+        const signalClone = signalCard.cloneNode(true);
+
+        marketCard.replaceWith(signalClone);
+        signalCard.replaceWith(marketClone);
+      }
+    }
+
+    function generateStrategyEmail(t, strategy){
+      const tenant = clean(t["Tenant Company"]) || "[Prospect]";
+      const contact = clean(t["Local Contact"]) || "there";
+      const address = clean(t["Address"]) || "[Property Address]";
+      const leaseEnd = clean(t["Lease End Date"]) || "[Lease Date]";
+      const industry = clean(t["AI Business Type"]) || "your business";
+
+      const templates = {
+        leaseExpiration: {
+          subject: `Upcoming lease timing at ${tenant}`,
+          body: `Hi ${contact},
+
+I came across ${tenant}${address ? " at " + address : ""} and noticed there may be an upcoming lease timing consideration around ${leaseEnd}.
+
+I work in commercial real estate in Tampa and help tenants evaluate renewals, relocations, expansions, and market alternatives before they are forced into a decision.
+
+Even if you are not actively looking today, it may be worth comparing current market options against your existing lease.
+
+Are you the right person to speak with about real estate decisions for ${tenant}?
+
+Best,
+Connor`
+        },
+
+        expansionSignal: {
+          subject: `Expansion question for ${tenant}`,
+          body: `Hi ${contact},
+
+I saw some signals that ${tenant} may be growing or evaluating future operational needs.
+
+I work with industrial and commercial tenants in Tampa on expansion strategy, site selection, and lease opportunities.
+
+If growth is on the radar, I would be happy to share what I am seeing in the market and identify options that could fit before they become widely marketed.
+
+Are you the right person to speak with about expansion or real estate planning?
+
+Best,
+Connor`
+        },
+
+        downsizeDisposition: {
+          subject: `Real estate flexibility for ${tenant}`,
+          body: `Hi ${contact},
+
+I wanted to reach out regarding ${tenant}${address ? " at " + address : ""}.
+
+If your team is evaluating efficiency, downsizing, disposition, sublease options, or a different footprint, I may be able to help identify market alternatives or create a strategy around the existing space.
+
+Even a short conversation could help determine whether there is a cost-saving or flexibility opportunity.
+
+Are you involved in real estate decisions for ${tenant}?
+
+Best,
+Connor`
+        },
+
+        marketInsight: {
+          subject: `Tampa market note for ${tenant}`,
+          body: `Hi ${contact},
+
+I work in the Tampa industrial and commercial real estate market and wanted to share a quick note.
+
+We are seeing movement in rents, available inventory, and tenant demand that may be relevant to ${tenant}${address ? " at " + address : ""}.
+
+I thought it may be useful to connect in case you want a read on current lease comps, relocation options, or market leverage.
+
+Are you the best person to speak with?
+
+Best,
+Connor`
+        },
+
+        coldIntro: {
+          subject: `Quick question on ${tenant}`,
+          body: `Hi ${contact},
+
+I came across ${tenant}${address ? " at " + address : ""} and wanted to introduce myself.
+
+I work in commercial real estate in Tampa and help businesses evaluate lease options, renewals, relocations, expansions, and market opportunities.
+
+Are you the right person to speak with about real estate decisions for ${tenant}, or is there someone else on your team I should connect with?
+
+Best,
+Connor`
+        },
+
+        stoppedBy: {
+          subject: `Stopped by ${tenant} today`,
+          body: `Hi ${contact},
+
+I was in the area today and stopped by ${tenant}${address ? " at " + address : ""}.
+
+I work in commercial real estate in Tampa and wanted to introduce myself in case your team ever needs help with lease strategy, expansion, relocation, or market information.
+
+Would you be open to a quick conversation this week?
+
+Best,
+Connor`
+        },
+
+        industrySpecific: {
+          subject: `Industry-specific real estate note for ${tenant}`,
+          body: `Hi ${contact},
+
+I wanted to reach out because ${tenant} appears to operate in ${industry}, and I have been spending more time tracking companies in that category across Tampa.
+
+Different industries have very different real estate needs — food and beverage, project management, logistics, distribution, service businesses, and manufacturing all look at space differently.
+
+I would be happy to compare notes on what I am seeing in the market and whether any current opportunities could be relevant to ${tenant}.
+
+Best,
+Connor`
+        },
+
+        purchaseOffer: {
+          subject: `Potential purchase interest — ${address}`,
+          body: `Hi ${contact},
+
+I am reaching out regarding ${tenant}${address ? " at " + address : ""}.
+
+I work with investors looking for industrial and commercial acquisition opportunities in Tampa. If ownership would ever consider a sale, or if there is a conversation to be had around value, I would be happy to discuss.
+
+This does not need to be an active listing — sometimes the best opportunities start with a quiet conversation.
+
+Would you be open to connecting?
+
+Best,
+Connor`
+        },
+
+        saleLeaseback: {
+          subject: `Sale-leaseback / acquisition idea for ${tenant}`,
+          body: `Hi ${contact},
+
+I wanted to reach out with a potential real estate idea for ${tenant}.
+
+If the company owns its facility or is evaluating capital needs, a sale-leaseback or acquisition structure could create liquidity while allowing the business to continue operating from the property.
+
+I work with investors and owner-users in Tampa and would be happy to discuss whether this type of structure could make sense.
+
+Are you the right person to speak with?
+
+Best,
+Connor`
+        }
+      };
+
+      return templates[strategy] || templates.coldIntro;
+    }
+
+    function filterProspects(){
+      const q = document.getElementById("prospectSearch").value.toLowerCase();
+
+      const filtered = tenants
+        .map((t, i) => ({...t, index: i}))
+        .filter(t =>
+          String(t["Tenant Company"] || "").toLowerCase().includes(q) ||
+          String(t["Address"] || "").toLowerCase().includes(q) ||
+          String(t["Local Contact"] || "").toLowerCase().includes(q) ||
+          String(t["Email"] || "").toLowerCase().includes(q)
+        );
+
+      const selected = filtered[0] || tenants[0];
+
+      if(selected){
+        const index = selected.index !== undefined ? selected.index : 0;
+        document.getElementById("selectedProspectIndex").value = index;
+        renderOutreachEmail();
+      }
+    }
+
+    function renderOutreachEmail(){
+      const tenantIndex = document.getElementById("selectedProspectIndex")?.value || 0;
+      const strategy = document.getElementById("strategySelect")?.value || "coldIntro";
+      const prospect = tenants[tenantIndex] || {};
+      const email = generateStrategyEmail(prospect, strategy);
+
+      document.getElementById("subjectBox").value = email.subject;
+      document.getElementById("emailBox").value = email.body;
+      document.getElementById("prospectEmail").value = clean(prospect["Email"]) || "[No email on file]";
+    }
+
+    function draftOutreachEmail(){
+      const prospectEmail = document.getElementById("prospectEmail").value;
+      const subject = document.getElementById("subjectBox").value;
+      const body = document.getElementById("emailBox").value;
+
+      const fullDraft =
+`Prospect Email: ${prospectEmail}
+
+Subject: ${subject}
+
+${body}`;
+
+      navigator.clipboard.writeText(fullDraft);
+
+      const gmailTo = "connorscs1127@gmail.com";
+      const gmailSubject = encodeURIComponent("Daily Weapon Draft: " + subject);
+      const gmailBody = encodeURIComponent(fullDraft);
+
+      window.open(
+        "https://mail.google.com/mail/?view=cm&fs=1&to=" + gmailTo + "&su=" + gmailSubject + "&body=" + gmailBody,
+        "_blank"
+      );
+    }
+
+    function render(){
+      const total = tenants.length;
+      const high = tenants.filter(t => t.score >= 70).length;
+      const contacted = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Contacted").length;
+      const meetings = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting").length;
+      const deals = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal").length;
+      const top = [...tenants].sort(pipelineSort).slice(0, 15);
+      const today = new Date().toISOString().split("T")[0];
+
+      const followups = tenants.filter(t => (callLog[t["Tenant Company"]] || {}).followup === today);
+      const meetingsList = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting");
+      const dealsList = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal");
+
+      document.getElementById("app").innerHTML = `
+        <div class="top-grid">
+          <div class="card hero market-intel-card">
+            <div>
+              <h2 style="font-size:40px; margin:0 0 20px; text-align:center;">Market Intelligence</h2>
+            </div>
+            <div class="metric-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom:0;">
+              <div class="card metric" onclick="openMarketData()"><div class="label">Market Data</div><div class="value">📊</div><div class="note">Rent trends, vacancy, cap rates</div></div>
+              <div class="card metric" onclick="openDailyNews()"><div class="label">Daily News</div><div class="value">📰</div><div class="note">WSJ + local CRE</div></div>
+              <div class="card metric" onclick="openCompData()"><div class="label">Comp Data</div><div class="value">🏢</div><div class="note">Lease + sale comps</div></div>
+              <div class="card metric" onclick="openModel()"><div class="label">Financial Analysis</div><div class="value">💰</div><div class="note">Underwrite deals</div></div>
+              <div class="card metric" onclick="openDemandDrivers()"><div class="label">Industrial Demand Drivers</div><div class="value">📦</div><div class="note">Logistics, 3PL, manufacturing</div></div>
+              <div class="card metric" onclick="openPermits()"><div class="label">Development / Permits</div><div class="value">🏗️</div><div class="note">New supply + buildouts</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Today’s Agenda</h2>
+
+            <div class="agent" onclick="scrollToPipeline()" style="cursor:pointer;">
+              <strong>New Outreach</strong>
+              <span class="pill">10</span>
+            </div>
+
+            <div class="agent" onclick="scrollToPipeline()" style="cursor:pointer;">
+              <strong>Follow-ups</strong>
+              <span class="pill">10</span>
+            </div>
+
+            <div class="agent" onclick="scrollToPipeline()" style="cursor:pointer;">
+              <strong>Meeting Prep</strong>
+              <span class="pill">2</span>
+            </div>
+
+            <div class="agent" onclick="refreshSignals()" style="cursor:pointer;">
+              <strong>Research</strong>
+              <span class="pill">10</span>
+            </div>
+
+            <div class="agent" style="cursor:pointer;">
+              <strong>News Articles</strong>
+              <span class="pill">1</span>
+            </div>
+
+            
+
+            
+
+            
+
+            <div class="agent" onclick="alert('Schedule module coming next. We can connect this to reminders or calendar later.')" style="cursor:pointer;">
+              
+
+            <strong>Today’s Schedule</strong>
+              <span class="pill">View</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-row">
+          <div class="card metric"><div class="label">High-Priority Prospects</div><div class="value">${high}</div><div class="note">Top outreach targets</div></div>
+          <div class="card metric"><div class="label">Active Pursuits</div><div class="value">26</div><div class="note">Prospects in motion</div></div>
+          <div class="card metric"><div class="label">Active Transactions</div><div class="value">17</div><div class="note">Deals progressing</div></div>
+          <div class="card metric"><div class="label">Potential Closings 2026</div><div class="value">10</div><div class="note">Execution focus</div></div>
+          <div class="card metric"><div class="label">Deals Closed 2026</div><div class="value">0</div><div class="note">Track wins</div></div>
+          
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2>🤖 Active Agents</h2>
+            ${[
+              ["Tenant Representation Research", "Researches tenant prospects, lease timing, contacts, and expansion opportunities.", "Active"],
+              ["Building / Land Sale Research", "Tracks owner activity, sale opportunities, land sites, and investor prospects.", "Active"],
+              ["Outreach Agent", "Builds email strategies, drafts messages, and supports prospecting workflows.", "Active"],
+              ["Signal Agent", "Tracks news, permits, ownership changes, hiring signals, and market triggers.", "Active"],
+              ["Financial Analyst Agent", "Supports underwriting, lease comparison, sale-leaseback, and deal modeling.", "Draft Mode"],
+              ["Marketing Material Agent", "Prepares pitch materials, deal summaries, maps, and client-facing reports.", "Planned"],
+              ["Daily Brief Agent", "Summarizes priorities, agenda items, news, and daily execution targets.", "Planned"]
+            ].map(a => `
+              <div class="agent">
+                <div><strong>${a[0]}</strong><div class="note">${a[1]}</div></div>
+                <span class="pill">${a[2]}</span>
+              </div>
+            `).join("")}
+          </div>
+
+          <div class="card">
+            <h2>📞 Pipeline + Outreach Preview</h2>
+            <button onclick="scrollToPipeline()">Open Full Tracker</button>
+
+            <div class="preview-scroll">
+              <table>
+                <tr>
+                  <th>Prospect</th>
+                  <th>Score</th>
+                  <th>Stage</th>
+                  <th>Next Step</th>
+                </tr>
+                ${top.slice(0,8).map(t => {
+                  const name = t["Tenant Company"];
+                  const stage = pipeline[name] || "Not Contacted";
+                  return `
+                    <tr>
+                      <td>${clean(name)}</td>
+                      <td class="${scoreClass(t.score)}">${scoreLabel(t.score)}</td>
+                      <td>${stage}</td>
+                      <td>${stage === "Not Contacted" ? "Email prospect" : stage === "Contacted" ? "Follow up" : stage === "Meeting" ? "Prep meeting" : stage === "Deal" ? "Push closing" : "No action"}</td>
+                    </tr>
+                  `;
+                }).join("")}
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2>Signal-Based Leads</h2>
+            <button onclick="refreshSignals()">Refresh Signals</button>
+            <button onclick="addTestSignal()">Test Signal</button>
+
+            <div class="grid-3">
+              <div class="card metric" onclick="window.open('https://www.wsj.com/news/economy', '_blank')">
+                <div class="label">Economy</div>
+                <div class="value">💰🇺🇸</div>
+                <div class="note">Macro trends + rates</div>
+              </div>
+
+              <div class="card metric" onclick="window.open('https://www.cbre.com/insights', '_blank')">
+                <div class="label">Market Forecasts</div>
+                <div class="value">🔮</div>
+                <div class="note">Industrial outlook</div>
+              </div>
+
+              <div class="card metric" onclick="window.open('https://app.hillsboroughcounty.org/DevelopmentServices/PermitReports', '_blank')">
+                <div class="label">Building Permits</div>
+                <div class="value">🏗️</div>
+                <div class="note">New supply + buildouts</div>
+              </div>
+
+              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+company+hiring+warehouse+logistics+manufacturing', '_blank')">
+                <div class="label">Company Hiring Signals</div>
+                <div class="value">👥</div>
+                <div class="note">Growth + expansion clues</div>
+              </div>
+
+              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+company+downsizing+layoffs+warehouse+office+industrial', '_blank')">
+                <div class="label">Disposition / Downsizing</div>
+                <div class="value">📉</div>
+                <div class="note">Space givebacks + distress</div>
+              </div>
+
+              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+Bay+housing+market+forecast', '_blank')">
+                <div class="label">Housing Market</div>
+                <div class="value">🏘️</div>
+                <div class="note">Population + demand drivers</div>
+              </div>
+            </div>
+            ${matchedSignals.length ? matchedSignals.map(s => `
+              <div class="card">
+                <p>📩 <strong>EMAIL NOW:</strong> ${s.tenant}</p>
+                <p><strong>Signal Score:</strong> ${s.signalScore} (${s.priority})</p>
+                <p><strong>Reason:</strong> ${s.title}</p>
+                <a href="${s.link}" target="_blank">Open signal</a>
+                <textarea readonly>${generateSignalEmail(s)}</textarea>
+              </div>
+            `).join("") : "<p>No matched signals yet. Click Test Signal to verify the workflow.</p>"}
+          </div>
+
+          <div class="card">
+            <h2>📩 Outreach Strategies</h2>
+
+            <label>Strategy</label>
+            <select id="strategySelect" onchange="renderOutreachEmail()">
+              <option value="leaseExpiration">Lease Expiration</option>
+              <option value="expansionSignal">Expansion Signal</option>
+              <option value="downsizeDisposition">Downsize / Disposition Signal</option>
+              <option value="marketInsight">Market Insight</option>
+              <option value="coldIntro">Intro / Cold Touch</option>
+              <option value="stoppedBy">Stopped by Warehouse Today</option>
+              <option value="industrySpecific">Industry Specific Targeted Message</option>
+              <option value="purchaseOffer">Purchase Offer / Investors</option>
+              <option value="saleLeaseback">Sale Leaseback / Acquisition Opportunity</option>
+            </select>
+
+            <label>Prospect</label>
+            <input id="prospectSearch" placeholder="Search prospect..." oninput="filterProspects()">
+
+            <input id="selectedProspectIndex" type="hidden" value="0">
+
+            <label>Email Address</label>
+            <input id="prospectEmail" readonly>
+
+            <label>Subject</label>
+            <input id="subjectBox" readonly>
+
+            <label>Email Draft</label>
+            <textarea id="emailBox" readonly></textarea>
+
+            <button onclick="draftOutreachEmail()">Draft Email</button>
+          </div>
+        </div>
+
+        
+
+        <div class="grid-2">
+          
+
+          
+        </div>
+      `;
+      swapMarketAndSignals();
+      swapAgentsAndMarket();
+    }
+
+    fetch("data.json")
+      .then(res => res.json())
+      .then(data => {
+        tenants = data.map(t => ({...t, score: score(t)})).sort((a,b) => b.score - a.score);
+        render();
+      })
+      .catch(err => {
+        document.getElementById("app").innerHTML = "<div class='card'>Error loading data.json: " + err + "</div>";
+      });
+  </script>
+</body>
+</html>
+EOFcd ~/Desktop/cre-command-center
+
+cat > index.html <<'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Daily Weapon 💵</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: #f8fafc;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.35), transparent 30%),
+        radial-gradient(circle at top right, rgba(124,58,237,.30), transparent 30%),
+        linear-gradient(135deg, #020617, #0f172a 45%, #111827);
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 28px 34px;
+      background: rgba(2,6,23,.75);
+      border-bottom: 1px solid rgba(148,163,184,.22);
+      backdrop-filter: blur(18px);
+    }
+
+    h1 { margin: 0; font-size: 38px; letter-spacing: -1px; }
+    h2 { margin: 0 0 14px; font-size: 24px; }
+    h3 { margin: 0 0 10px; }
+
+    .page {
+      padding: 24px;
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(30,41,59,.88), rgba(15,23,42,.74));
+      border: 1px solid rgba(148,163,184,.25);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.28);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        linear-gradient(135deg, rgba(37,99,235,.55), rgba(124,58,237,.35)),
+        rgba(15,23,42,.8);
+    }
+
+    .metric {
+      cursor: pointer;
+      transition: .18s ease;
+      min-height: 125px;
+    }
+
+    .metric:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 38px rgba(37,99,235,.35);
+    }
+
+    .label {
+      font-size: 12px;
+      color: #bfdbfe;
+      text-transform: uppercase;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .value {
+      font-size: 34px;
+      font-weight: 900;
+      margin-top: 8px;
+    }
+
+    .note {
+      color: #cbd5e1;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border-radius: 18px;
+      background: rgba(15,23,42,.62);
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(148,163,184,.16);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      background: rgba(2,6,23,.85);
+      color: #bfdbfe;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    tr:hover td { background: rgba(59,130,246,.08); }
+
+    button {
+      padding: 10px 13px;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,.25);
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      margin: 4px 4px 4px 0;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    textarea, input, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,.22);
+      background: rgba(15,23,42,.9);
+      color: white;
+      margin: 8px 0 12px;
+    }
+
+    textarea { min-height: 150px; }
+
+    .agent {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px;
+      border-radius: 16px;
+      background: rgba(30,41,59,.75);
+      border: 1px solid rgba(148,163,184,.18);
+      margin-bottom: 10px;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      background: rgba(37,99,235,.35);
+      color: #bfdbfe;
+    }
+
+    .high { color: #fb7185; font-weight: 900; }
+    .medium { color: #facc15; font-weight: 900; }
+    .low { color: #4ade80; font-weight: 900; }
+
+    a { color: #93c5fd; font-weight: 800; }
+
+    .section { margin-bottom: 18px; }
+  
+    .preview-scroll {
+      max-height: 420px;
+      overflow-y: auto;
+      overflow-x: auto;
+      border-radius: 18px;
+    }
+
+    .jump-button {
+      margin-bottom: 12px;
+    }
+
+    .good-score { color:#4ade80; font-weight:900; }
+    .okay-score { color:#fb923c; font-weight:900; }
+    .bad-score { color:#f87171; font-weight:900; }
+
+    .market-intel-card {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      text-align: center !important;
+      min-height: 360px;
+    }
+
+    .market-intel-card .metric-row {
+      width: 100%;
+      align-items: stretch;
+      margin-top: 18px !important;
+    }
+</style>
+</head>
+
+<body>
+  <header onclick="openSchedule()" style="cursor:pointer;">
+    <h1>Daily Weapon 💵</h1>
+    <p>Connor's Master CRM — Built For Closers</p>
+  </header>
+
+  <div class="page">
+    <div id="app">Loading Daily Weapon 💵</div>
+  </div>
+
+  <script>
+    let tenants = [];
+    let matchedSignals = [];
+    let callLog = JSON.parse(localStorage.getItem("callLog") || "{}");
+    let pipeline = JSON.parse(localStorage.getItem("pipeline") || "{}");
+
+    function saveLog(){ localStorage.setItem("callLog", JSON.stringify(callLog)); }
+    function savePipeline(){ localStorage.setItem("pipeline", JSON.stringify(pipeline)); }
+
+    function clean(v){ return v || ""; }
+
+    function score(t){
+      let s = 0;
+      const text = [
+        t["Tenant Company"], t["AI Business Summary"], t["AI Business Type"],
+        t["AI Expansion Signals"], t["AI Broker Angle"], t["Notes"], t["Website"]
+      ].join(" ").toLowerCase();
+
+      if (t["Local Contact"]) s += 25;
+      if (t["Business Phone (Local Contact) (Contact)"] || t["Mobile Phone (Local Contact) (Contact)"]) s += 20;
+      if (t["Email"]) s += 15;
+      if (t["Website"]) s += 10;
+      if (t["Lease End Date"]) s += 20;
+      if (text.includes("expansion")) s += 25;
+      if (text.includes("new location")) s += 25;
+      if (text.includes("hiring")) s += 15;
+      if (text.includes("franchise")) s += 15;
+      if (text.includes("retail")) s += 10;
+      if (text.includes("medical")) s += 10;
+      if (text.includes("restaurant")) s += 10;
+      if (text.includes("service")) s += 8;
+
+      return s;
+    }
+
+    function scoreLabel(score){
+      if(score >= 90) return "🟢 Good";
+      if(score >= 50) return "🟠 Okay";
+      return "🔴 Bad";
+    }
+
+    function scoreClass(score){
+      if(score >= 90) return "good-score";
+      if(score >= 50) return "okay-score";
+      return "bad-score";
+    }
+
+    function level(score){
+      if(score >= 70) return "high";
+      if(score >= 40) return "medium";
+      return "low";
+    }
+
+    function scoreSignal(title) {
+      const text = title.toLowerCase();
+      let score = 0;
+      if (text.includes("expansion")) score += 30;
+      if (text.includes("new location")) score += 30;
+      if (text.includes("opening")) score += 25;
+      if (text.includes("lease")) score += 20;
+      if (text.includes("acquires") || text.includes("acquisition")) score += 20;
+      if (text.includes("permits") || text.includes("permit")) score += 20;
+      if (text.includes("tampa")) score += 15;
+      if (text.includes("florida")) score += 10;
+      if (text.includes("hiring")) score += 10;
+      return score;
+    }
+
+    function signalPriority(score) {
+      if (score >= 50) return "HIGH";
+      if (score >= 25) return "MEDIUM";
+      return "LOW";
+    }
+
+    function generateSignalEmail(signal){
+      return `Subject: Quick note on ${signal.tenant}
+
+Hi,
+
+I came across this recently and thought of you:
+
+"${signal.title}"
+
+I work in commercial real estate in Tampa and help tenants think through expansion, relocation, and lease strategy.
+
+Not sure if this is relevant on your end, but if there is anything around growth, market positioning, or upcoming lease decisions, I would be happy to share what I am seeing in the market.
+
+Are you the right person to speak with, or is there someone else on your team I should connect with?
+
+Best,
+Connor`;
+    }
+
+    function generateEmail(t) {
+      const tenant = clean(t["Tenant Company"]);
+      const contact = clean(t["Local Contact"]) || "there";
+      const address = clean(t["Address"]);
+      const leaseEnd = clean(t["Lease End Date"]);
+
+      return `Subject: Quick question on ${tenant}
+
+Hi ${contact},
+
+I work in commercial real estate in the Tampa market and came across ${tenant}${address ? " at " + address : ""}.
+
+I help tenants evaluate lease options, expansion opportunities, relocations, and market positioning. ${leaseEnd ? "I also noticed a lease date around " + leaseEnd + ", so timing may be worth reviewing." : ""}
+
+Are you the right person to speak with about real estate decisions for ${tenant}, or is there someone else I should connect with?
+
+Best,
+Connor`;
+    }
+
+    function addTestSignal(){
+      matchedSignals = [{
+        tenant: "National Waterproofing Supply",
+        title: "National Waterproofing Supply expansion opportunity in Tampa",
+        link: "https://www.google.com/search?q=National+Waterproofing+Supply+Tampa+expansion",
+        signalScore: 75,
+        priority: "HIGH"
+      }];
+      render();
+    }
+
+    function refreshSignals(){
+      matchedSignals = [];
+      fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent("https://news.google.com/rss/search?q=tampa+commercial+real+estate+tenant+expansion"))
+        .then(res => res.text())
+        .then(str => new DOMParser().parseFromString(str, "text/xml"))
+        .then(data => {
+          const items = [...data.querySelectorAll("item")].slice(0, 25);
+          items.forEach(i => {
+            const title = i.querySelector("title")?.textContent || "";
+            const link = i.querySelector("link")?.textContent || "";
+            tenants.forEach(t => {
+              const tenant = (t["Tenant Company"] || "").toLowerCase();
+              if(!tenant || tenant.length < 4) return;
+              const words = tenant.replace(/[^a-z0-9 ]/g, "").split(" ").filter(w => w.length > 3);
+              const simpleTitle = title.toLowerCase().replace(/[^a-z0-9 ]/g, "");
+              const matches = words.filter(w => simpleTitle.includes(w)).length;
+              if(matches >= Math.min(2, words.length)) {
+                const signalScore = scoreSignal(title);
+                matchedSignals.push({
+                  tenant: t["Tenant Company"],
+                  title, link, signalScore,
+                  priority: signalPriority(signalScore)
+                });
+              }
+            });
+          });
+          matchedSignals.sort((a,b) => b.signalScore - a.signalScore);
+          render();
+        })
+        .catch(() => {
+          alert("Could not load live signals right now. Test Signal still works.");
+        });
+    }
+
+    function setStage(name, stage){
+      pipeline[name] = stage;
+      savePipeline();
+      render();
+    }
+
+    function markCalled(name){
+      callLog[name] = callLog[name] || {};
+      callLog[name].called = true;
+      saveLog();
+      render();
+    }
+
+    function setFollow(name, date){
+      callLog[name] = callLog[name] || {};
+      callLog[name].followup = date;
+      saveLog();
+    }
+
+    function setNotes(name, val){
+      callLog[name] = callLog[name] || {};
+      callLog[name].notes = val;
+      saveLog();
+    }
+
+    function scrollToPipeline(){
+      document.getElementById("pipelineTracker").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function openLinkedIn(company){
+      const query = encodeURIComponent(company + " Tampa owner president founder operations real estate");
+      window.open("https://www.linkedin.com/search/results/people/?keywords=" + query, "_blank");
+    }
+
+    function openMarketData(){
+      alert("Market Data module coming next: rent trends, vacancy, cap rates, and market reports.");
+    }
+
+    function openDemandDrivers(){
+      alert("Industrial Demand Drivers module coming next: logistics, 3PL growth, manufacturing, port activity, infrastructure, and reshoring signals.");
+    }
+
+    function openPermits(){
+      window.open("https://app.hillsboroughcounty.org/DevelopmentServices/PermitReports", "_blank");
+    }
+
+    function openDailyNews(){
+      window.open("https://www.bizjournals.com/tampabay/", "_blank");
+      window.open("https://www.wsj.com/news/realestate", "_blank");
+    }
+
+    function openCompData(){
+      alert("Comp Data module coming next: lease comps, sale comps, and market reports.");
+    }
+
+    function openSchedule(){
+      alert("Schedule module coming next. We can connect Google Calendar or task system here.");
+    }
+
+    function openModel(){
+      window.open("Daily_Weapon_Financial_Model.xlsx", "_blank");
+    }
+
+    function parseLeaseDate(value){
+      if(!value) return null;
+
+      const text = String(value).trim();
+      const parsed = new Date(text);
+
+      if(!isNaN(parsed)) return parsed;
+
+      const months = {
+        jan:0, january:0,
+        feb:1, february:1,
+        mar:2, march:2,
+        apr:3, april:3,
+        may:4,
+        jun:5, june:5,
+        jul:6, july:6,
+        aug:7, august:7,
+        sep:8, sept:8, september:8,
+        oct:9, october:9,
+        nov:10, november:10,
+        dec:11, december:11
+      };
+
+      const parts = text.toLowerCase().replace(",", "").split(/\s+/);
+      const month = months[parts[0]];
+      const year = parts.find(p => /^20\d{2}$/.test(p));
+
+      if(month !== undefined && year) {
+        return new Date(Number(year), month, 1);
+      }
+
+      return null;
+    }
+
+    function contactScore(t){
+      let s = 0;
+      if(t["Local Contact"]) s += 40;
+      if(t["Business Phone (Local Contact) (Contact)"]) s += 25;
+      if(t["Mobile Phone (Local Contact) (Contact)"]) s += 25;
+      if(t["Email"]) s += 20;
+      if(t["Website"]) s += 10;
+      return s;
+    }
+
+    function pipelineSort(a,b){
+      const cutoff = new Date(2028, 0, 1);
+
+      const aDate = parseLeaseDate(a["Lease End Date"]);
+      const bDate = parseLeaseDate(b["Lease End Date"]);
+
+      const aUrgent = aDate && aDate <= cutoff;
+      const bUrgent = bDate && bDate <= cutoff;
+
+      if(aUrgent && bUrgent){
+        return aDate - bDate || contactScore(b) - contactScore(a);
+      }
+
+      if(aUrgent && !bUrgent) return -1;
+      if(!aUrgent && bUrgent) return 1;
+
+      return contactScore(b) - contactScore(a);
+    }
+
+    function swapAgentsAndMarket(){
+      const cards = [...document.querySelectorAll(".card")];
+
+      const marketCard = cards.find(card =>
+        card.innerText.includes("Market Intelligence")
+      );
+
+      const agentCard = cards.find(card =>
+        card.innerText.includes("Active Agents")
+      );
+
+      if(marketCard && agentCard){
+        const marketClone = marketCard.cloneNode(true);
+        const agentClone = agentCard.cloneNode(true);
+
+        marketCard.replaceWith(agentClone);
+        agentCard.replaceWith(marketClone);
+      }
+    }
+
+    function swapMarketAndSignals(){
+      const cards = [...document.querySelectorAll(".card")];
+
+      const marketCard = cards.find(card =>
+        card.innerText.includes("Market Intelligence")
+      );
+
+      const signalCard = cards.find(card =>
+        card.innerText.includes("Signal-Based Leads")
+      );
+
+      if(marketCard && signalCard){
+        const marketClone = marketCard.cloneNode(true);
+        const signalClone = signalCard.cloneNode(true);
+
+        marketCard.replaceWith(signalClone);
+        signalCard.replaceWith(marketClone);
+      }
+    }
+
+    function generateStrategyEmail(t, strategy){
+      const tenant = clean(t["Tenant Company"]) || "[Prospect]";
+      const contact = clean(t["Local Contact"]) || "there";
+      const address = clean(t["Address"]) || "[Property Address]";
+      const leaseEnd = clean(t["Lease End Date"]) || "[Lease Date]";
+      const industry = clean(t["AI Business Type"]) || "your business";
+
+      const templates = {
+        leaseExpiration: {
+          subject: `Upcoming lease timing at ${tenant}`,
+          body: `Hi ${contact},
+
+I came across ${tenant}${address ? " at " + address : ""} and noticed there may be an upcoming lease timing consideration around ${leaseEnd}.
+
+I work in commercial real estate in Tampa and help tenants evaluate renewals, relocations, expansions, and market alternatives before they are forced into a decision.
+
+Even if you are not actively looking today, it may be worth comparing current market options against your existing lease.
+
+Are you the right person to speak with about real estate decisions for ${tenant}?
+
+Best,
+Connor`
+        },
+
+        expansionSignal: {
+          subject: `Expansion question for ${tenant}`,
+          body: `Hi ${contact},
+
+I saw some signals that ${tenant} may be growing or evaluating future operational needs.
+
+I work with industrial and commercial tenants in Tampa on expansion strategy, site selection, and lease opportunities.
+
+If growth is on the radar, I would be happy to share what I am seeing in the market and identify options that could fit before they become widely marketed.
+
+Are you the right person to speak with about expansion or real estate planning?
+
+Best,
+Connor`
+        },
+
+        downsizeDisposition: {
+          subject: `Real estate flexibility for ${tenant}`,
+          body: `Hi ${contact},
+
+I wanted to reach out regarding ${tenant}${address ? " at " + address : ""}.
+
+If your team is evaluating efficiency, downsizing, disposition, sublease options, or a different footprint, I may be able to help identify market alternatives or create a strategy around the existing space.
+
+Even a short conversation could help determine whether there is a cost-saving or flexibility opportunity.
+
+Are you involved in real estate decisions for ${tenant}?
+
+Best,
+Connor`
+        },
+
+        marketInsight: {
+          subject: `Tampa market note for ${tenant}`,
+          body: `Hi ${contact},
+
+I work in the Tampa industrial and commercial real estate market and wanted to share a quick note.
+
+We are seeing movement in rents, available inventory, and tenant demand that may be relevant to ${tenant}${address ? " at " + address : ""}.
+
+I thought it may be useful to connect in case you want a read on current lease comps, relocation options, or market leverage.
+
+Are you the best person to speak with?
+
+Best,
+Connor`
+        },
+
+        coldIntro: {
+          subject: `Quick question on ${tenant}`,
+          body: `Hi ${contact},
+
+I came across ${tenant}${address ? " at " + address : ""} and wanted to introduce myself.
+
+I work in commercial real estate in Tampa and help businesses evaluate lease options, renewals, relocations, expansions, and market opportunities.
+
+Are you the right person to speak with about real estate decisions for ${tenant}, or is there someone else on your team I should connect with?
+
+Best,
+Connor`
+        },
+
+        stoppedBy: {
+          subject: `Stopped by ${tenant} today`,
+          body: `Hi ${contact},
+
+I was in the area today and stopped by ${tenant}${address ? " at " + address : ""}.
+
+I work in commercial real estate in Tampa and wanted to introduce myself in case your team ever needs help with lease strategy, expansion, relocation, or market information.
+
+Would you be open to a quick conversation this week?
+
+Best,
+Connor`
+        },
+
+        industrySpecific: {
+          subject: `Industry-specific real estate note for ${tenant}`,
+          body: `Hi ${contact},
+
+I wanted to reach out because ${tenant} appears to operate in ${industry}, and I have been spending more time tracking companies in that category across Tampa.
+
+Different industries have very different real estate needs — food and beverage, project management, logistics, distribution, service businesses, and manufacturing all look at space differently.
+
+I would be happy to compare notes on what I am seeing in the market and whether any current opportunities could be relevant to ${tenant}.
+
+Best,
+Connor`
+        },
+
+        purchaseOffer: {
+          subject: `Potential purchase interest — ${address}`,
+          body: `Hi ${contact},
+
+I am reaching out regarding ${tenant}${address ? " at " + address : ""}.
+
+I work with investors looking for industrial and commercial acquisition opportunities in Tampa. If ownership would ever consider a sale, or if there is a conversation to be had around value, I would be happy to discuss.
+
+This does not need to be an active listing — sometimes the best opportunities start with a quiet conversation.
+
+Would you be open to connecting?
+
+Best,
+Connor`
+        },
+
+        saleLeaseback: {
+          subject: `Sale-leaseback / acquisition idea for ${tenant}`,
+          body: `Hi ${contact},
+
+I wanted to reach out with a potential real estate idea for ${tenant}.
+
+If the company owns its facility or is evaluating capital needs, a sale-leaseback or acquisition structure could create liquidity while allowing the business to continue operating from the property.
+
+I work with investors and owner-users in Tampa and would be happy to discuss whether this type of structure could make sense.
+
+Are you the right person to speak with?
+
+Best,
+Connor`
+        }
+      };
+
+      return templates[strategy] || templates.coldIntro;
+    }
+
+    function filterProspects(){
+      const q = document.getElementById("prospectSearch").value.toLowerCase();
+
+      const filtered = tenants
+        .map((t, i) => ({...t, index: i}))
+        .filter(t =>
+          String(t["Tenant Company"] || "").toLowerCase().includes(q) ||
+          String(t["Address"] || "").toLowerCase().includes(q) ||
+          String(t["Local Contact"] || "").toLowerCase().includes(q) ||
+          String(t["Email"] || "").toLowerCase().includes(q)
+        );
+
+      const selected = filtered[0] || tenants[0];
+
+      if(selected){
+        const index = selected.index !== undefined ? selected.index : 0;
+        document.getElementById("selectedProspectIndex").value = index;
+        renderOutreachEmail();
+      }
+    }
+
+    function renderOutreachEmail(){
+      const tenantIndex = document.getElementById("selectedProspectIndex")?.value || 0;
+      const strategy = document.getElementById("strategySelect")?.value || "coldIntro";
+      const prospect = tenants[tenantIndex] || {};
+      const email = generateStrategyEmail(prospect, strategy);
+
+      document.getElementById("subjectBox").value = email.subject;
+      document.getElementById("emailBox").value = email.body;
+      document.getElementById("prospectEmail").value = clean(prospect["Email"]) || "[No email on file]";
+    }
+
+    function draftOutreachEmail(){
+      const prospectEmail = document.getElementById("prospectEmail").value;
+      const subject = document.getElementById("subjectBox").value;
+      const body = document.getElementById("emailBox").value;
+
+      const fullDraft =
+`Prospect Email: ${prospectEmail}
+
+Subject: ${subject}
+
+${body}`;
+
+      navigator.clipboard.writeText(fullDraft);
+
+      const gmailTo = "connorscs1127@gmail.com";
+      const gmailSubject = encodeURIComponent("Daily Weapon Draft: " + subject);
+      const gmailBody = encodeURIComponent(fullDraft);
+
+      window.open(
+        "https://mail.google.com/mail/?view=cm&fs=1&to=" + gmailTo + "&su=" + gmailSubject + "&body=" + gmailBody,
+        "_blank"
+      );
+    }
+
+    function render(){
+      const total = tenants.length;
+      const high = tenants.filter(t => t.score >= 70).length;
+      const contacted = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Contacted").length;
+      const meetings = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting").length;
+      const deals = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal").length;
+      const top = [...tenants].sort(pipelineSort).slice(0, 15);
+      const today = new Date().toISOString().split("T")[0];
+
+      const followups = tenants.filter(t => (callLog[t["Tenant Company"]] || {}).followup === today);
+      const meetingsList = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting");
+      const dealsList = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal");
+
+      document.getElementById("app").innerHTML = `
+        <div class="top-grid">
+          <div class="card hero market-intel-card">
+            <div>
+              <h2 style="font-size:40px; margin:0 0 20px; text-align:center;">Market Intelligence</h2>
+            </div>
+            <div class="metric-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom:0;">
+              <div class="card metric" onclick="openMarketData()"><div class="label">Market Data</div><div class="value">📊</div><div class="note">Rent trends, vacancy, cap rates</div></div>
+              <div class="card metric" onclick="openDailyNews()"><div class="label">Daily News</div><div class="value">📰</div><div class="note">WSJ + local CRE</div></div>
+              <div class="card metric" onclick="openCompData()"><div class="label">Comp Data</div><div class="value">🏢</div><div class="note">Lease + sale comps</div></div>
+              <div class="card metric" onclick="openModel()"><div class="label">Financial Analysis</div><div class="value">💰</div><div class="note">Underwrite deals</div></div>
+              <div class="card metric" onclick="openDemandDrivers()"><div class="label">Industrial Demand Drivers</div><div class="value">📦</div><div class="note">Logistics, 3PL, manufacturing</div></div>
+              <div class="card metric" onclick="openPermits()"><div class="label">Development / Permits</div><div class="value">🏗️</div><div class="note">New supply + buildouts</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Today’s Agenda</h2>
+
+            <div class="agent" onclick="scrollToPipeline()" style="cursor:pointer;">
+              <strong>New Outreach</strong>
+              <span class="pill">10</span>
+            </div>
+
+            <div class="agent" onclick="scrollToPipeline()" style="cursor:pointer;">
+              <strong>Follow-ups</strong>
+              <span class="pill">10</span>
+            </div>
+
+            <div class="agent" onclick="scrollToPipeline()" style="cursor:pointer;">
+              <strong>Meeting Prep</strong>
+              <span class="pill">2</span>
+            </div>
+
+            <div class="agent" onclick="refreshSignals()" style="cursor:pointer;">
+              <strong>Research</strong>
+              <span class="pill">10</span>
+            </div>
+
+            <div class="agent" style="cursor:pointer;">
+              <strong>News Articles</strong>
+              <span class="pill">1</span>
+            </div>
+
+            
+
+            
+
+            
+
+            <div class="agent" onclick="alert('Schedule module coming next. We can connect this to reminders or calendar later.')" style="cursor:pointer;">
+              
+
+            <strong>Today’s Schedule</strong>
+              <span class="pill">View</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-row">
+          <div class="card metric"><div class="label">High-Priority Prospects</div><div class="value">${high}</div><div class="note">Top outreach targets</div></div>
+          <div class="card metric"><div class="label">Active Pursuits</div><div class="value">26</div><div class="note">Prospects in motion</div></div>
+          <div class="card metric"><div class="label">Active Transactions</div><div class="value">17</div><div class="note">Deals progressing</div></div>
+          <div class="card metric"><div class="label">Potential Closings 2026</div><div class="value">10</div><div class="note">Execution focus</div></div>
+          <div class="card metric"><div class="label">Deals Closed 2026</div><div class="value">0</div><div class="note">Track wins</div></div>
+          
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2>🤖 Active Agents</h2>
+            ${[
+              ["Tenant Representation Research", "Researches tenant prospects, lease timing, contacts, and expansion opportunities.", "Active"],
+              ["Building / Land Sale Research", "Tracks owner activity, sale opportunities, land sites, and investor prospects.", "Active"],
+              ["Outreach Agent", "Builds email strategies, drafts messages, and supports prospecting workflows.", "Active"],
+              ["Signal Agent", "Tracks news, permits, ownership changes, hiring signals, and market triggers.", "Active"],
+              ["Financial Analyst Agent", "Supports underwriting, lease comparison, sale-leaseback, and deal modeling.", "Draft Mode"],
+              ["Marketing Material Agent", "Prepares pitch materials, deal summaries, maps, and client-facing reports.", "Planned"],
+              ["Daily Brief Agent", "Summarizes priorities, agenda items, news, and daily execution targets.", "Planned"]
+            ].map(a => `
+              <div class="agent">
+                <div><strong>${a[0]}</strong><div class="note">${a[1]}</div></div>
+                <span class="pill">${a[2]}</span>
+              </div>
+            `).join("")}
+          </div>
+
+          
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2>Signal-Based Leads</h2>
+            <button onclick="refreshSignals()">Refresh Signals</button>
+            <button onclick="addTestSignal()">Test Signal</button>
+
+            <div class="grid-3">
+              <div class="card metric" onclick="window.open('https://www.wsj.com/news/economy', '_blank')">
+                <div class="label">Economy</div>
+                <div class="value">💰🇺🇸</div>
+                <div class="note">Macro trends + rates</div>
+              </div>
+
+              <div class="card metric" onclick="window.open('https://www.cbre.com/insights', '_blank')">
+                <div class="label">Market Forecasts</div>
+                <div class="value">🔮</div>
+                <div class="note">Industrial outlook</div>
+              </div>
+
+              <div class="card metric" onclick="window.open('https://app.hillsboroughcounty.org/DevelopmentServices/PermitReports', '_blank')">
+                <div class="label">Building Permits</div>
+                <div class="value">🏗️</div>
+                <div class="note">New supply + buildouts</div>
+              </div>
+
+              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+company+hiring+warehouse+logistics+manufacturing', '_blank')">
+                <div class="label">Company Hiring Signals</div>
+                <div class="value">👥</div>
+                <div class="note">Growth + expansion clues</div>
+              </div>
+
+              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+company+downsizing+layoffs+warehouse+office+industrial', '_blank')">
+                <div class="label">Disposition / Downsizing</div>
+                <div class="value">📉</div>
+                <div class="note">Space givebacks + distress</div>
+              </div>
+
+              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+Bay+housing+market+forecast', '_blank')">
+                <div class="label">Housing Market</div>
+                <div class="value">🏘️</div>
+                <div class="note">Population + demand drivers</div>
+              </div>
+            </div>
+            <button onclick="refreshSignals()">Refresh Signals</button>
+            <button onclick="addTestSignal()">Test Signal</button>
+            <button onclick="refreshSignals()">Refresh Signals</button>
+            <button onclick="addTestSignal()">Test Signal</button>
+            ${matchedSignals.length ? matchedSignals.map(s => `
+              <div class="card">
+                <p>📩 <strong>EMAIL NOW:</strong> ${s.tenant}</p>
+                <p><strong>Signal Score:</strong> ${s.signalScore} (${s.priority})</p>
+                <p><strong>Reason:</strong> ${s.title}</p>
+                <a href="${s.link}" target="_blank">Open signal</a>
+                <textarea readonly>${generateSignalEmail(s)}</textarea>
+              </div>
+            `).join("") : "<p>No matched signals yet. Click Test Signal to verify the workflow.</p>"}
+          </div>
+
+          <div class="card">
+            <h2>📩 Outreach Strategies</h2>
+
+            <label>Strategy</label>
+            <select id="strategySelect" onchange="renderOutreachEmail()">
+              <option value="leaseExpiration">Lease Expiration</option>
+              <option value="expansionSignal">Expansion Signal</option>
+              <option value="downsizeDisposition">Downsize / Disposition Signal</option>
+              <option value="marketInsight">Market Insight</option>
+              <option value="coldIntro">Intro / Cold Touch</option>
+              <option value="stoppedBy">Stopped by Warehouse Today</option>
+              <option value="industrySpecific">Industry Specific Targeted Message</option>
+              <option value="purchaseOffer">Purchase Offer / Investors</option>
+              <option value="saleLeaseback">Sale Leaseback / Acquisition Opportunity</option>
+            </select>
+
+            <label>Prospect</label>
+            <input id="prospectSearch" placeholder="Search prospect..." oninput="filterProspects()">
+
+            <input id="selectedProspectIndex" type="hidden" value="0">
+
+            <label>Email Address</label>
+            <input id="prospectEmail" readonly>
+
+            <label>Subject</label>
+            <input id="subjectBox" readonly>
+
+            <label>Email Draft</label>
+            <textarea id="emailBox" readonly></textarea>
+
+            <button onclick="draftOutreachEmail()">Draft Email</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>📞 Pipeline + Outreach Tracker</h2>
+          <table>
+            <tr>
+              <th>Prospect</th><th>Address</th><th>Score</th><th>Contact</th><th>LinkedIn</th><th>Called</th><th>Follow-up</th><th>Stage</th><th>Notes</th>
+            </tr>
+            ${top.map(t => {
+              const name = t["Tenant Company"];
+              const log = callLog[name] || {};
+              const stage = pipeline[name] || "Not Contacted";
+              return `
+                <tr>
+                  <td>${clean(name)}</td>
+                  <td>${clean(t["Address"])}</td>
+                  <td class="${scoreClass(t.score)}">${scoreLabel(t.score)}</td>
+                  <td>${clean(t["Local Contact"])}</td>
+                  <td><button onclick="openLinkedIn('${clean(name)}')">Search</button></td>
+                  <td><button onclick="markCalled('${clean(name)}')">${log.called ? "✅ Done" : "Mark"}</button></td>
+                  <td><input type="date" value="${log.followup || ""}" onchange="setFollow('${clean(name)}', this.value)"></td>
+                  <td>
+                    <select onchange="setStage('${clean(name)}', this.value)">
+                      ${["Not Contacted","Contacted","Meeting","Deal","Dead"].map(s => `<option ${stage===s ? "selected":""}>${s}</option>`).join("")}
+                    </select>
+                  </td>
+                  <td><textarea onchange="setNotes('${clean(name)}', this.value)">${log.notes || ""}</textarea></td>
+                </tr>
+              `;
+            }).join("")}
+          </table>
+        </div>
+
+        <div class="grid-2">
+          
+
+          
+        </div>
+      `;
+      setTimeout(renderOutreachEmail, 0);
+    }
+
+    fetch("data.json")
+      .then(res => res.json())
+      .then(data => {
+        tenants = data.map(t => ({...t, score: score(t)})).sort((a,b) => b.score - a.score);
+        render();
+      })
+      .catch(err => {
+        document.getElementById("app").innerHTML = "<div class='card'>Error loading data.json: " + err + "</div>";
+      });
+  </script>
+</body>
+</html>
