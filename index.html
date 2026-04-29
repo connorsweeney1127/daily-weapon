@@ -771,7 +771,47 @@ ${body}`;
       );
     }
 
-    function render(){
+    
+function detectStrategyFromSignal(s){
+  const text = (s.title || "").toLowerCase();
+
+  if(text.includes("expand") || text.includes("growth") || text.includes("hiring")){
+    return "expansionSignal";
+  }
+
+  if(text.includes("downsize") || text.includes("closure") || text.includes("layoff")){
+    return "downsizeDisposition";
+  }
+
+  if(text.includes("lease") || text.includes("expiring")){
+    return "leaseExpiration";
+  }
+
+  return "marketInsight";
+}
+
+function useSignalForOutreach(signal){
+  // set strategy
+  const strategy = detectStrategyFromSignal(signal);
+  document.getElementById("strategySelect").value = strategy;
+
+  // find matching prospect
+  const index = tenants.findIndex(t =>
+    (t["Tenant Company"] || "").toLowerCase().includes((signal.tenant || "").toLowerCase())
+  );
+
+  if(index >= 0){
+    document.getElementById("selectedProspectIndex").value = index;
+  }
+
+  renderOutreachEmail();
+
+  // scroll to outreach section
+  document.getElementById("emailBox").scrollIntoView({behavior: "smooth"});
+}
+
+
+function render(){
       const total = tenants.length;
       const high = tenants.filter(t => t.score >= 70).length;
       const contacted = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Contacted").length;
@@ -950,6 +990,9 @@ ${body}`;
                 <p><strong>Reason:</strong> ${s.title}</p>
                 <a href="${s.link}" target="_blank">Open signal</a>
                 <textarea readonly>${generateSignalEmail(s)}</textarea>
+    <button onclick="useSignalForOutreach(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+      Generate Email
+    </button>
               </div>
             `).join("") : "<p>No matched signals yet. Click Test Signal to verify the workflow.</p>"}
           </div>
@@ -1788,7 +1831,47 @@ ${body}`;
       );
     }
 
-    function render(){
+    
+function detectStrategyFromSignal(s){
+  const text = (s.title || "").toLowerCase();
+
+  if(text.includes("expand") || text.includes("growth") || text.includes("hiring")){
+    return "expansionSignal";
+  }
+
+  if(text.includes("downsize") || text.includes("closure") || text.includes("layoff")){
+    return "downsizeDisposition";
+  }
+
+  if(text.includes("lease") || text.includes("expiring")){
+    return "leaseExpiration";
+  }
+
+  return "marketInsight";
+}
+
+function useSignalForOutreach(signal){
+  // set strategy
+  const strategy = detectStrategyFromSignal(signal);
+  document.getElementById("strategySelect").value = strategy;
+
+  // find matching prospect
+  const index = tenants.findIndex(t =>
+    (t["Tenant Company"] || "").toLowerCase().includes((signal.tenant || "").toLowerCase())
+  );
+
+  if(index >= 0){
+    document.getElementById("selectedProspectIndex").value = index;
+  }
+
+  renderOutreachEmail();
+
+  // scroll to outreach section
+  document.getElementById("emailBox").scrollIntoView({behavior: "smooth"});
+}
+
+
+function render(){
       const total = tenants.length;
       const high = tenants.filter(t => t.score >= 70).length;
       const contacted = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Contacted").length;
@@ -1945,6 +2028,9 @@ ${body}`;
                 <p><strong>Reason:</strong> ${s.title}</p>
                 <a href="${s.link}" target="_blank">Open signal</a>
                 <textarea readonly>${generateSignalEmail(s)}</textarea>
+    <button onclick="useSignalForOutreach(${JSON.stringify(s).replace(/"/g, '&quot;')})">
+      Generate Email
+    </button>
               </div>
             `).join("") : "<p>No matched signals yet. Click Test Signal to verify the workflow.</p>"}
           </div>
