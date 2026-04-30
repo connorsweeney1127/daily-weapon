@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Prospect Outreach Engine</title>
+  <style>
+    body { margin:0; font-family:Arial; background:#020617; color:white; padding:24px; }
+    .grid { display:grid; grid-template-columns:1fr 1.2fr; gap:18px; }
+    .card { background:#0f172a; border:1px solid #334155; border-radius:18px; padding:16px; margin-bottom:14px; }
+    input, select, textarea { width:100%; padding:10px; border-radius:10px; border:1px solid #334155; background:#020617; color:white; margin:8px 0 12px; }
+    textarea { min-height:420px; }
+    button { padding:10px 14px; border-radius:12px; border:0; background:linear-gradient(135deg,#2563eb,#7c3aed); color:white; font-weight:800; cursor:pointer; margin-right:8px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:10px; border-bottom:1px solid #334155; text-align:left; }
+    tr:hover { background:#111827; cursor:pointer; }
+    .scroll { max-height:650px; overflow:auto; }
+  </style>
+</head>
+<body>
+
+<h1>📩 Prospect Outreach Engine</h1>
+<p>Search your CRM, draft emails, mark outreach sent, and create follow-up pursuits.</p>
+
+<div class="grid">
+  <div class="card">
+    <h2>Prospects</h2>
+
+    <input id="search" placeholder="Search company, contact, address..." oninput="renderProspects()">
+
+    <select id="sort" onchange="renderProspects()">
+      <option value="company">Sort by Company</option>
+      <option value="lease">Sort by Lease Expiration</option>
+      <option value="contact">Has Contact First</option>
+      <option value="email">Has Email First</option>
+    </select>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Company</th><th>Contact</th><th>Email</th><th>Lease</th></tr>
+        </thead>
+        <tbody id="prospectRows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Email Draft</h2>
+
+    <label>Strategy</label>
+    <select id="strategy" onchange="renderDraft()">
+      <option value="coldIntro">Intro / Cold Touch</option>
+      <option value="leaseExpiration">Lease Expiration</option>
+      <option value="marketInsight">Market Insight</option>
+      <option value="stoppedBy">Stopped by Warehouse Today</option>
+      <option value="expansionSignal">Expansion Signal</option>
+      <option value="downsizeDisposition">Downsize / Disposition</option>
+      <option value="purchaseOffer">Purchase Offer / Investors</option>
+      <option value="saleLeaseback">Sale Leaseback / Acquisition</option>
+    </select>
+
+    <label>Selected Prospect</label>
+    <input id="selectedName" readonly>
+
+    <label>Subject</label>
+    <input id="subject">
+
+    <label>Email</label>
+    <textarea id="emailBody"></textarea>
+
+    <button onclick="copyEmail()">Copy Email</button>
+    <button onclick="markSent()">Mark Sent + Create Follow-Up</button>
+
+    <p id="status"></p>
+  </div>
+</div>
+
+<script>
+let prospects = [];
+let selectedIndex = 0;
+let activePursuits = JSON.parse(localStorage.getItem("activePursuits") || "[]");
+
+function clean(v){ return v || ""; }
+
+function parseLeaseDate(value){
+  if(!value) return new Date(9999,0,1);
+  const parsed = new Date(value);
+  if(!isNaN(parsed)) return parsed;
+
+  const months = {jan:0,january:0,feb:1,february:1,mar:2,march:2,apr:3,april:3,may:4,jun:5,june:5,jul:6,july:6,aug:7,august:7,sep:8,sept:8,september:8,oct:9,october:9,nov:10,november:10,dec:11,december:11};
+  const parts = String(value).toLowerCase().replace(",", "").split(/\s+/);
+  const month = months[parts[0]];
+  const year = parts.find(p => /^20\d{2}$/.test(p));
+  if(month !== undefined && year) return new Date(Number(year), month, 1);
+  return new Date(9999,0,1);
+}
+
+function firstName(contact){
+  return contact ? contact.split(" ")[0] : "there";
+}
+
+function defaultFollowupDate(){
+  const d = new Date();
+  d.setDate(d.getDate() + 3);
+  return d.toISOString().split("T")[0];
+}
+
+function generateEmail(p, strategy){
+  const company = clean(p["Tenant Company"]) || "[Company]";
+  const contact = clean(p["Local Contact"]);
+  const email = clean(p["Email"]) || "[No email found]";
+  const address = clean(p["Address"]);
+  const lease = clean(p["Lease End Date"]) || "[Lease Date]";
+  const first = firstName(contact);
+
+  const header = `Contact: ${contact || "[No contact found]"}
+Email: ${email}
+Company: ${company}
+
+`;
+
+  const templates = {
+    coldIntro: {
+      subject: `Quick question on ${company}`,
+      body: `Hi ${first},
+
+I came across ${company}${address ? " at " + address : ""} and wanted to introduce myself.
+
+I work in commercial real estate in Tampa and help businesses evaluate lease options, renewals, relocations, expansions, and market opportunities.
+
+Are you the right person to speak with about real estate decisions for ${company}, or is there someone else on your team I should connect with?
+
+Best,
+Connor`
+    },
+    leaseExpiration: {
+      subject: `Upcoming lease timing at ${company}`,
+      body: `Hi ${first},
+
+I came across ${company}${address ? " at " + address : ""} and noticed there may be an upcoming lease timing consideration around ${lease}.
+
+I help tenants compare renewal options, relocation alternatives, and current market leverage before they are forced into a decision.
+
+Would it be worth comparing what you have today against what is available in the Tampa market?
+
+Best,
+Connor`
+    },
+    marketInsight: {
+      subject: `Tampa market note for ${company}`,
+      body: `Hi ${first},
+
+I wanted to share a quick Tampa market note in case it is relevant to ${company}.
+
+I am seeing movement in availability, rents, and tenant demand across the industrial/commercial market. If you are evaluating your current footprint, upcoming lease timing, or future space needs, I would be happy to be a resource.
+
+Are you the right person to connect with?
+
+Best,
+Connor`
+    },
+    stoppedBy: {
+      subject: `Stopped by ${company} today`,
+      body: `Hi ${first},
+
+I was in the area today and stopped by ${company}${address ? " at " + address : ""}.
+
+I work in commercial real estate in Tampa and wanted to introduce myself in case your team ever needs help with lease strategy, expansion, relocation, or market information.
+
+Would you be open to a quick conversation this week?
+
+Best,
+Connor`
+    },
+    expansionSignal: {
+      subject: `Expansion question for ${company}`,
+      body: `Hi ${first},
+
+I wanted to reach out in case ${company} is evaluating growth, additional space, or future operational needs in Tampa.
+
+I work with industrial and commercial tenants on expansion strategy, site selection, and lease opportunities.
+
+Are you the right person to speak with about real estate planning?
+
+Best,
+Connor`
+    },
+    downsizeDisposition: {
+      subject: `Real estate flexibility for ${company}`,
+      body: `Hi ${first},
+
+I wanted to reach out regarding ${company}${address ? " at " + address : ""}.
+
+If your team is evaluating efficiency, downsizing, disposition, sublease options, or a different footprint, I may be able to help identify market alternatives or create a strategy around the existing space.
+
+Best,
+Connor`
+    },
+    purchaseOffer: {
+      subject: `Potential purchase interest — ${address || company}`,
+      body: `Hi ${first},
+
+I am reaching out regarding ${company}${address ? " at " + address : ""}.
+
+I work with investors looking for commercial and industrial acquisition opportunities in Tampa. If ownership would ever consider a sale, or if there is a conversation to be had around value, I would be happy to discuss.
+
+Best,
+Connor`
+    },
+    saleLeaseback: {
+      subject: `Sale-leaseback / acquisition idea for ${company}`,
+      body: `Hi ${first},
+
+I wanted to reach out with a potential real estate idea for ${company}.
+
+If the company owns its facility or is evaluating capital needs, a sale-leaseback or acquisition structure could create liquidity while allowing the business to continue operating from the property.
+
+Are you the right person to speak with?
+
+Best,
+Connor`
+    }
+  };
+
+  const t = templates[strategy] || templates.coldIntro;
+  return { subject: t.subject, body: header + t.body };
+}
+
+function renderProspects(){
+  const q = document.getElementById("search").value.toLowerCase();
+  const sort = document.getElementById("sort").value;
+
+  let list = prospects
+    .map((p,i)=>({...p, index:i}))
+    .filter(p =>
+      String(p["Tenant Company"] || "").toLowerCase().includes(q) ||
+      String(p["Local Contact"] || "").toLowerCase().includes(q) ||
+      String(p["Address"] || "").toLowerCase().includes(q) ||
+      String(p["Email"] || "").toLowerCase().includes(q)
+    );
+
+  if(sort === "company") list.sort((a,b)=>String(a["Tenant Company"]).localeCompare(String(b["Tenant Company"])));
+  if(sort === "lease") list.sort((a,b)=>parseLeaseDate(a["Lease End Date"]) - parseLeaseDate(b["Lease End Date"]));
+  if(sort === "contact") list.sort((a,b)=>(b["Local Contact"]?1:0)-(a["Local Contact"]?1:0));
+  if(sort === "email") list.sort((a,b)=>(b["Email"]?1:0)-(a["Email"]?1:0));
+
+  document.getElementById("prospectRows").innerHTML = list.slice(0,200).map(p => `
+    <tr onclick="selectProspect(${p.index})">
+      <td>${clean(p["Tenant Company"])}</td>
+      <td>${clean(p["Local Contact"])}</td>
+      <td>${clean(p["Email"]) || "[missing]"}</td>
+      <td>${clean(p["Lease End Date"])}</td>
+    </tr>
+  `).join("");
+}
+
+function selectProspect(i){
+  selectedIndex = i;
+  renderDraft();
+}
+
+function renderDraft(){
+  const p = prospects[selectedIndex] || {};
+  const strategy = document.getElementById("strategy").value;
+  const draft = generateEmail(p, strategy);
+
+  document.getElementById("selectedName").value = `${clean(p["Tenant Company"])} — ${clean(p["Local Contact"])} — ${clean(p["Email"]) || "[No email]"}`;
+  document.getElementById("subject").value = draft.subject;
+  document.getElementById("emailBody").value = draft.body;
+}
+
+function copyEmail(){
+  const subject = document.getElementById("subject").value;
+  const body = document.getElementById("emailBody").value;
+  navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`);
+  document.getElementById("status").innerText = "Email copied.";
+}
+
+function markSent(){
+  const p = prospects[selectedIndex] || {};
+  const pursuit = {
+    company: clean(p["Tenant Company"]),
+    contact: clean(p["Local Contact"]),
+    email: clean(p["Email"]),
+    address: clean(p["Address"]),
+    source: "Regular Outreach",
+    stage: "Contacted",
+    bucket: "today",
+    followup: defaultFollowupDate(),
+    notes: "Email sent from Prospect Outreach Engine",
+    createdAt: new Date().toISOString()
+  };
+
+  activePursuits.push(pursuit);
+  localStorage.setItem("activePursuits", JSON.stringify(activePursuits));
+  document.getElementById("status").innerText = "Marked sent and added to Active Pursuits.";
+}
+
+fetch("data.json")
+  .then(res => res.json())
+  .then(data => {
+    prospects = data;
+    renderProspects();
+    renderDraft();
+  });
+</script>
+
+</body>
+</html>
