@@ -811,7 +811,29 @@ function useSignalForOutreach(signal){
 }
 
 
-function render(){
+function useSignalForOutreachByTenant(tenantName){
+      const index = tenants.findIndex(t =>
+        String(t["Tenant Company"] || "").toLowerCase().includes(String(tenantName || "").toLowerCase())
+      );
+
+      if(index >= 0){
+        document.getElementById("selectedProspectIndex").value = index;
+      }
+
+      const strategyBox = document.getElementById("strategySelect");
+      if(strategyBox){
+        strategyBox.value = "expansionSignal";
+      }
+
+      renderOutreachEmail();
+
+      const emailBox = document.getElementById("emailBox");
+      if(emailBox){
+        emailBox.scrollIntoView({behavior: "smooth"});
+      }
+    }
+
+    function render(){
       const total = tenants.length;
       const high = tenants.filter(t => t.score >= 70).length;
       const contacted = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Contacted").length;
@@ -990,6 +1012,7 @@ function render(){
                 <p><strong>Reason:</strong> ${s.title}</p>
                 <a href="${s.link}" target="_blank">Open signal</a>
                 <textarea readonly>${generateSignalEmail(s)}</textarea>
+                <button onclick="useSignalForOutreachByTenant('${s.tenant}')">Generate Email</button>
     <button onclick="useSignalForOutreach(${JSON.stringify(s).replace(/"/g, '&quot;')})">
       Generate Email
     </button>
@@ -1871,7 +1894,29 @@ function useSignalForOutreach(signal){
 }
 
 
-function render(){
+function useSignalForOutreachByTenant(tenantName){
+      const index = tenants.findIndex(t =>
+        String(t["Tenant Company"] || "").toLowerCase().includes(String(tenantName || "").toLowerCase())
+      );
+
+      if(index >= 0){
+        document.getElementById("selectedProspectIndex").value = index;
+      }
+
+      const strategyBox = document.getElementById("strategySelect");
+      if(strategyBox){
+        strategyBox.value = "expansionSignal";
+      }
+
+      renderOutreachEmail();
+
+      const emailBox = document.getElementById("emailBox");
+      if(emailBox){
+        emailBox.scrollIntoView({behavior: "smooth"});
+      }
+    }
+
+    function render(){
       const total = tenants.length;
       const high = tenants.filter(t => t.score >= 70).length;
       const contacted = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Contacted").length;
@@ -2028,6 +2073,7 @@ function render(){
                 <p><strong>Reason:</strong> ${s.title}</p>
                 <a href="${s.link}" target="_blank">Open signal</a>
                 <textarea readonly>${generateSignalEmail(s)}</textarea>
+                <button onclick="useSignalForOutreachByTenant('${s.tenant}')">Generate Email</button>
     <button onclick="useSignalForOutreach(${JSON.stringify(s).replace(/"/g, '&quot;')})">
       Generate Email
     </button>
