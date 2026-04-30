@@ -851,6 +851,7 @@ function useSignalForOutreachByTenant(tenantName){
       const contacted = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Contacted").length;
       const meetings = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting").length;
       const deals = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal").length;
+      const activePursuits = JSON.parse(localStorage.getItem("activePursuits") || "[]");
       const top = [...tenants].sort(pipelineSort).slice(0, 15);
       const today = new Date().toISOString().split("T")[0];
 
@@ -976,6 +977,24 @@ function useSignalForOutreachByTenant(tenantName){
 
         <div class="grid-2">
           <div class="card">
+          <h2>🎯 Active Pursuits</h2>
+          ${
+            activePursuits.length
+              ? activePursuits.slice(0,8).map(p => `
+                <div class="agent">
+                  <div>
+                    <strong>${p.company}</strong>
+                    <div class="note">${p.signal}</div>
+                    <div class="note">${p.contact || "No contact"} — ${p.email || "No email"}</div>
+                  </div>
+                  <span class="pill">${p.status}</span>
+                </div>
+              `).join("")
+              : "<p>No active pursuits yet. Accept signals from the Signal Leads page.</p>"
+          }
+        </div>
+
+        <div class="card">
             <h2>Signal-Based Leads</h2>
             <p class="note">Signal inbox lives on the dedicated Signal Leads page so the dashboard stays clean.</p>
             <button onclick="window.open('signals.html', '_blank')">Open Signal Leads</button>
@@ -1898,6 +1917,7 @@ function useSignalForOutreachByTenant(tenantName){
       const contacted = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Contacted").length;
       const meetings = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting").length;
       const deals = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal").length;
+      const activePursuits = JSON.parse(localStorage.getItem("activePursuits") || "[]");
       const top = [...tenants].sort(pipelineSort).slice(0, 15);
       const today = new Date().toISOString().split("T")[0];
 
