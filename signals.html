@@ -111,6 +111,24 @@
       return `This signal was connected to ${s.tenant} because the prospect name or related keywords appeared in the signal headline. Review the source to confirm whether it is actionable.`;
     }
 
+    function matchProspects(signal){
+      const text = (signal.title || "").toLowerCase();
+
+      return prospects.filter(p => {
+        const name = (p["Tenant Company"] || "").toLowerCase();
+        const industry = (p["AI Business Type"] || "").toLowerCase();
+        const address = (p["Address"] || "").toLowerCase();
+
+        return (
+          text.includes(name) ||
+          text.includes(industry) ||
+          (text.includes("logistics") && industry.includes("logistics")) ||
+          (text.includes("warehouse") && industry.includes("distribution")) ||
+          (text.includes("manufacturing") && industry.includes("manufacturing"))
+        );
+      }).slice(0, 5); // limit to top 5 matches
+    }
+
     function renderSignals(){
       const q = document.getElementById("search").value.toLowerCase();
       const list = sampleSignals
@@ -128,6 +146,10 @@
           <p><strong>What triggered this:</strong> ${s.title}</p>
           <p><strong>Why this prospect:</strong> ${getProspectWhy(s)}</p>
           <p><a href="${s.link}" target="_blank">Open Signal</a></p>
+          <div class="note">
+            <strong>Matched Prospects:</strong>
+            ${matchProspects(s).map(p => `<div>• ${p["Tenant Company"]}</div>`).join("")}
+          </div>
           <button onclick="copyEmail('${s.tenant}', '${s.title}')">Copy Outreach Email</button>
           <button onclick="declineSignal('${s.tenant}', '${s.title}')">Decline Signal</button>
         </div>
