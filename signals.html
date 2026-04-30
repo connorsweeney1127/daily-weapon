@@ -15,6 +15,8 @@
     }
     textarea { width:100%; min-height:360px; resize:vertical; margin-top:12px; background:#0f172a; color:white; border:1px solid #334155; border-radius:12px; padding:12px; }
     .action-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    select { width:100%; padding:12px; border-radius:12px; border:1px solid #334155; background:#0f172a; color:white; margin-bottom:18px; }
+    label { display:block; margin-bottom:6px; font-weight:800; color:#bfdbfe; }
     input {
       width:100%;
       padding:12px;
@@ -41,6 +43,29 @@
   <p>New signals tied to prospects. Review the WHY, open the source, then accept for outreach or decline.</p>
 
   <input id="search" placeholder="Search signal, tenant, keyword..." oninput="renderSignals()">
+
+  <div class="card">
+    <label>Signal Type</label>
+    <select id="typeFilter" onchange="renderSignals()">
+      <option value="all">All Types</option>
+      <option value="Expansion / Growth Signal">Expansion / Growth</option>
+      <option value="Hiring / Headcount Signal">Hiring / Headcount</option>
+      <option value="Permit / Development Signal">Permit / Development</option>
+      <option value="Downsize / Disposition Signal">Downsize / Disposition</option>
+      <option value="Transaction / Real Estate Signal">Transaction / Real Estate</option>
+      <option value="Market / News Signal">Market / News</option>
+    </select>
+
+    <label>Prospect</label>
+    <input id="prospectFilter" placeholder="Filter by prospect..." oninput="renderSignals()">
+
+    <label>Status</label>
+    <select id="statusFilter" onchange="renderSignals()">
+      <option value="open">Open Signals</option>
+      <option value="all">All Signals</option>
+      <option value="declined">Declined Only</option>
+    </select>
+  </div>
 
   <div id="signals"></div>
 
@@ -163,15 +188,48 @@
       savedSignals = JSON.parse(localStorage.getItem("matchedSignals") || "[]");
       const activeSignals = savedSignals.length ? savedSignals : sampleSignals;
       const q = document.getElementById("search").value.toLowerCase();
-      const list = activeSignals
-        .filter(s => !declinedSignals.includes(signalId(s)))
-        .filter(s =>
-          s.tenant.toLowerCase().includes(q) ||
-          s.title.toLowerCase().includes(q) ||
-          s.priority.toLowerCase().includes(q)
-        );
+      const typeFilter = document.getElementById("typeFilter")?.value || "all";
+      const prospectFilter = document.getElementById("prospectFilter")?.value.toLowerCase() || "";
+      const statusFilter = document.getElementById("statusFilter")?.value || "open";
 
-      document.getElementById("signals").innerHTML = list.map(s => `
+      const list = activeSignals
+        .filter(s => {
+          const isDeclined = declinedSignals.includes(signalId(s));
+
+          if(statusFilter === "open" && isDeclined) return false;
+          if(statusFilter === "declined" && !isDeclined) return false;
+
+          return true;
+        })
+        .filter(s => {
+          const type = getSignalType(s.title);
+          return typeFilter === "all" || type === typeFilter;
+        })
+        .filter(s => {
+          const tenant = String(s.tenant || "").toLowerCase();
+          const title = String(s.title || "").toLowerCase();
+          const priority = String(s.priority || "").toLowerCase();
+
+          return (
+            tenant.includes(q) ||
+            title.includes(q) ||
+            priority.includes(q)
+          );
+        })
+        .filter(s => {
+          if(!prospectFilter) return true;
+          return matchProspects(s).some(p =>
+            String(p["Tenant Company"] || "").toLowerCase().includes(prospectFilter) ||
+            String(p["Address"] || "").toLowerCase().includes(prospectFilter) ||
+            String(p["Local Contact"] || "").toLowerCase().includes(prospectFilter)
+          );
+        });
+
+      document.getElementById("signals").innerHTML = `
+        <div class="card">
+          <strong>${list.length}</strong> signals shown
+        </div>
+      ` + list.map(s => `
         <div class="card">
           <h2>${s.tenant}</h2>
           <p><strong>Signal Type:</strong> ${getSignalType(s.title)}</p>
