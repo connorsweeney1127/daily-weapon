@@ -152,8 +152,9 @@
               <div style="margin-top:10px; padding:10px; border:1px solid #334155; border-radius:12px;">
                 <strong>${p["Tenant Company"]}</strong><br>
                 <span>${p["Address"] || ""}</span><br>
+                <textarea id="email_${p["Tenant Company"].replace(/[^a-zA-Z0-9]/g, "_")}">${buildMatchedProspectEmail(p["Tenant Company"], s.title)}</textarea>
                 <button onclick="copyMatchedProspectEmail('${p["Tenant Company"]}', '${s.title}')">
-                  Generate Email
+                  Copy Email
                 </button>
               </div>
             `).join("")}
@@ -164,7 +165,7 @@
       `).join("");
     }
 
-    function copyMatchedProspectEmail(company, title){
+    function buildMatchedProspectEmail(company, title){
       const prospect = prospects.find(p =>
         String(p["Tenant Company"] || "").toLowerCase() === String(company || "").toLowerCase()
       ) || {};
@@ -173,7 +174,7 @@
       const emailAddress = prospect["Email"] || "[No email found]";
       const firstName = contact !== "[No contact found]" ? contact.split(" ")[0] : "there";
 
-      const email = `Contact: ${contact}
+      return `Contact: ${contact}
 Email: ${emailAddress}
 Company: ${company}
 
@@ -193,6 +194,12 @@ Are you the right person to speak with about real estate decisions for ${company
 
 Best,
 Connor`;
+    }
+
+    function copyMatchedProspectEmail(company, title){
+      const id = "email_" + company.replace(/[^a-zA-Z0-9]/g, "_");
+      const box = document.getElementById(id);
+      const email = box ? box.value : buildMatchedProspectEmail(company, title);
 
       navigator.clipboard.writeText(email);
       alert("Email copied for " + company);

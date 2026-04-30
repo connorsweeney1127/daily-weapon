@@ -975,60 +975,12 @@ function useSignalForOutreachByTenant(tenantName){
 
         <div class="grid-2">
           <div class="card">
-            <h2>Signal-Based Leads</h2><button onclick="window.open('signals.html', '_blank')">Open Full Signal Leads Page</button>
+            <h2>Signal-Based Leads</h2>
+            <p class="note">Signal inbox lives on the dedicated Signal Leads page so the dashboard stays clean.</p>
+            <button onclick="window.open('signals.html', '_blank')">Open Signal Leads</button>
             <button onclick="refreshSignals()">Refresh Signals</button>
             <button onclick="addTestSignal()">Test Signal</button>
-
-            <div class="grid-3">
-              <div class="card metric" onclick="window.open('https://www.wsj.com/news/economy', '_blank')">
-                <div class="label">Economy</div>
-                <div class="value">💰🇺🇸</div>
-                <div class="note">Macro trends + rates</div>
-              </div>
-
-              <div class="card metric" onclick="window.open('https://www.cbre.com/insights', '_blank')">
-                <div class="label">Market Forecasts</div>
-                <div class="value">🔮</div>
-                <div class="note">Industrial outlook</div>
-              </div>
-
-              <div class="card metric" onclick="window.open('https://app.hillsboroughcounty.org/DevelopmentServices/PermitReports', '_blank')">
-                <div class="label">Building Permits</div>
-                <div class="value">🏗️</div>
-                <div class="note">New supply + buildouts</div>
-              </div>
-
-              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+company+hiring+warehouse+logistics+manufacturing', '_blank')">
-                <div class="label">Company Hiring Signals</div>
-                <div class="value">👥</div>
-                <div class="note">Growth + expansion clues</div>
-              </div>
-
-              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+company+downsizing+layoffs+warehouse+office+industrial', '_blank')">
-                <div class="label">Disposition / Downsizing</div>
-                <div class="value">📉</div>
-                <div class="note">Space givebacks + distress</div>
-              </div>
-
-              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+Bay+housing+market+forecast', '_blank')">
-                <div class="label">Housing Market</div>
-                <div class="value">🏘️</div>
-                <div class="note">Population + demand drivers</div>
-              </div>
-            </div>
-            ${matchedSignals.length ? matchedSignals.map(s => `
-              <div class="card">
-                <p>📩 <strong>EMAIL NOW:</strong> ${s.tenant}</p>
-                <p><strong>Signal Score:</strong> ${s.signalScore} (${s.priority})</p>
-                <p><strong>Reason:</strong> ${s.title}</p>
-                <a href="${s.link}" target="_blank">Open signal</a>
-                <textarea readonly>${generateSignalEmail(s)}</textarea>
-                <button onclick="useSignalForOutreachByTenant('${s.tenant}')">Generate Email</button>
-    <button onclick="useSignalForOutreach(${JSON.stringify(s).replace(/"/g, '&quot;')})">
-      Generate Email
-    </button>
-              </div>
-            `).join("") : "<p>No matched signals yet. Click Test Signal to verify the workflow.</p>"}
+            <p><strong>Current matched signals:</strong> ${matchedSignals.length}</p>
           </div>
 
           <div class="card">
@@ -2044,63 +1996,11 @@ function useSignalForOutreachByTenant(tenantName){
         <div class="grid-2">
           <div class="card">
             <h2>Signal-Based Leads</h2>
+            <p class="note">Signal inbox lives on the dedicated Signal Leads page so the dashboard stays clean.</p>
+            <button onclick="window.open('signals.html', '_blank')">Open Signal Leads</button>
             <button onclick="refreshSignals()">Refresh Signals</button>
             <button onclick="addTestSignal()">Test Signal</button>
-
-            <div class="grid-3">
-              <div class="card metric" onclick="window.open('https://www.wsj.com/news/economy', '_blank')">
-                <div class="label">Economy</div>
-                <div class="value">💰🇺🇸</div>
-                <div class="note">Macro trends + rates</div>
-              </div>
-
-              <div class="card metric" onclick="window.open('https://www.cbre.com/insights', '_blank')">
-                <div class="label">Market Forecasts</div>
-                <div class="value">🔮</div>
-                <div class="note">Industrial outlook</div>
-              </div>
-
-              <div class="card metric" onclick="window.open('https://app.hillsboroughcounty.org/DevelopmentServices/PermitReports', '_blank')">
-                <div class="label">Building Permits</div>
-                <div class="value">🏗️</div>
-                <div class="note">New supply + buildouts</div>
-              </div>
-
-              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+company+hiring+warehouse+logistics+manufacturing', '_blank')">
-                <div class="label">Company Hiring Signals</div>
-                <div class="value">👥</div>
-                <div class="note">Growth + expansion clues</div>
-              </div>
-
-              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+company+downsizing+layoffs+warehouse+office+industrial', '_blank')">
-                <div class="label">Disposition / Downsizing</div>
-                <div class="value">📉</div>
-                <div class="note">Space givebacks + distress</div>
-              </div>
-
-              <div class="card metric" onclick="window.open('https://www.google.com/search?q=Tampa+Bay+housing+market+forecast', '_blank')">
-                <div class="label">Housing Market</div>
-                <div class="value">🏘️</div>
-                <div class="note">Population + demand drivers</div>
-              </div>
-            </div>
-            <button onclick="refreshSignals()">Refresh Signals</button>
-            <button onclick="addTestSignal()">Test Signal</button>
-            <button onclick="refreshSignals()">Refresh Signals</button>
-            <button onclick="addTestSignal()">Test Signal</button>
-            ${matchedSignals.length ? matchedSignals.map(s => `
-              <div class="card">
-                <p>📩 <strong>EMAIL NOW:</strong> ${s.tenant}</p>
-                <p><strong>Signal Score:</strong> ${s.signalScore} (${s.priority})</p>
-                <p><strong>Reason:</strong> ${s.title}</p>
-                <a href="${s.link}" target="_blank">Open signal</a>
-                <textarea readonly>${generateSignalEmail(s)}</textarea>
-                <button onclick="useSignalForOutreachByTenant('${s.tenant}')">Generate Email</button>
-    <button onclick="useSignalForOutreach(${JSON.stringify(s).replace(/"/g, '&quot;')})">
-      Generate Email
-    </button>
-              </div>
-            `).join("") : "<p>No matched signals yet. Click Test Signal to verify the workflow.</p>"}
+            <p><strong>Current matched signals:</strong> ${matchedSignals.length}</p>
           </div>
 
           <div class="card">
