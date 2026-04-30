@@ -308,6 +308,36 @@
       `).join("");
     }
 
+    function signalOpeningSentence(company, title){
+      const type = getSignalType(title);
+
+      if(type === "SEC Disposition Signal"){
+        return `I saw a public filing/reference that appears to mention asset sales, dispositions, or real estate review activity connected to ${company}: "${title}"`;
+      }
+
+      if(type === "Probate / Estate Signal"){
+        return `I saw a public estate/probate-related signal that may involve real estate tied to ${company}: "${title}"`;
+      }
+
+      if(type === "Foreclosure / Distress Signal"){
+        return `I saw a public distress/foreclosure-related filing that may be relevant to ${company}: "${title}"`;
+      }
+
+      if(type === "Permit / Development Signal"){
+        return `I saw a permit/development-related signal that may point to activity near or connected to ${company}: "${title}"`;
+      }
+
+      if(type === "Hiring / Headcount Signal"){
+        return `I saw a hiring/headcount signal that may suggest growth or operational change at ${company}: "${title}"`;
+      }
+
+      if(type === "Expansion / Growth Signal"){
+        return `I saw a growth or expansion-related signal connected to ${company}: "${title}"`;
+      }
+
+      return `I came across this recent market signal and thought it may be relevant to ${company}: "${title}"`;
+    }
+
     function buildMatchedProspectEmail(company, title){
       const prospect = prospects.find(p =>
         String(p["Tenant Company"] || "").toLowerCase() === String(company || "").toLowerCase()
@@ -333,9 +363,7 @@ Subject: Quick note on ${company}
 
 Hi ${firstName},
 
-I came across this signal and thought it may be relevant:
-
-"${title}"
+${signalOpeningSentence(company, title)}
 
 I work in commercial real estate in Tampa and help companies evaluate expansion, relocation, lease strategy, and market opportunities.
 
@@ -373,9 +401,7 @@ Subject: Quick note on ${tenant}
 
 Hi ${firstName},
 
-I came across this recent signal and thought it may be relevant:
-
-"${title}"
+${signalOpeningSentence(company, title)}
 
 I work in commercial real estate in Tampa and help companies evaluate expansion, relocation, lease strategy, and market opportunities.
 
