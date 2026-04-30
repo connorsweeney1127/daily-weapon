@@ -36,7 +36,7 @@
 </head>
 <body>
   <h1>⚡ Signal Leads</h1>
-  <p>Organized list of signal-based outreach opportunities.</p>
+  <p>New signals tied to prospects. Review the WHY, open the source, then accept for outreach or decline.</p>
 
   <input id="search" placeholder="Search signal, tenant, keyword..." oninput="renderSignals()">
 
@@ -68,6 +68,36 @@
       renderSignals();
     }
 
+    function getSignalType(title){
+      const text = title.toLowerCase();
+
+      if(text.includes("expansion") || text.includes("opening") || text.includes("growth")) {
+        return "Expansion / Growth Signal";
+      }
+
+      if(text.includes("hiring") || text.includes("jobs")) {
+        return "Hiring / Headcount Signal";
+      }
+
+      if(text.includes("permit") || text.includes("construction") || text.includes("development")) {
+        return "Permit / Development Signal";
+      }
+
+      if(text.includes("downsize") || text.includes("layoff") || text.includes("closure")) {
+        return "Downsize / Disposition Signal";
+      }
+
+      if(text.includes("lease") || text.includes("sale") || text.includes("acquisition")) {
+        return "Transaction / Real Estate Signal";
+      }
+
+      return "Market / News Signal";
+    }
+
+    function getProspectWhy(s){
+      return `This signal was connected to ${s.tenant} because the prospect name or related keywords appeared in the signal headline. Review the source to confirm whether it is actionable.`;
+    }
+
     function renderSignals(){
       const q = document.getElementById("search").value.toLowerCase();
       const list = sampleSignals
@@ -81,9 +111,9 @@
       document.getElementById("signals").innerHTML = list.map(s => `
         <div class="card">
           <h2>${s.tenant}</h2>
-          <p><strong>Priority:</strong> ${s.priority}</p>
-          <p><strong>Signal Score:</strong> ${s.score}</p>
-          <p><strong>Reason:</strong> ${s.title}</p>
+          <p><strong>Signal Type:</strong> ${getSignalType(s.title)}</p>
+          <p><strong>What triggered this:</strong> ${s.title}</p>
+          <p><strong>Why this prospect:</strong> ${getProspectWhy(s)}</p>
           <p><a href="${s.link}" target="_blank">Open Signal</a></p>
           <button onclick="copyEmail('${s.tenant}', '${s.title}')">Copy Outreach Email</button>
           <button onclick="declineSignal('${s.tenant}', '${s.title}')">Decline Signal</button>
