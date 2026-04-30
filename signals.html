@@ -45,6 +45,7 @@
   <script>
     let prospects = [];
     let declinedSignals = JSON.parse(localStorage.getItem("declinedSignals") || "[]");
+    let activePursuits = JSON.parse(localStorage.getItem("activePursuits") || "[]");
 
     const sampleSignals = [
       {
@@ -58,6 +59,31 @@
 
     function signalId(s){
       return `${s.tenant}::${s.title}`;
+    }
+
+    function acceptSignal(company, title){
+      const prospect = prospects.find(p =>
+        String(p["Tenant Company"] || "").toLowerCase() === String(company || "").toLowerCase()
+      ) || {};
+
+      const pursuit = {
+        company,
+        contact: prospect["Local Contact"] || "",
+        email: prospect["Email"] || "",
+        address: prospect["Address"] || "",
+        signal: title,
+        status: "Active Pursuit",
+        followup: "",
+        notes: "Accepted from Signal Leads",
+        createdAt: new Date().toISOString()
+      };
+
+      activePursuits.push(pursuit);
+      localStorage.setItem("activePursuits", JSON.stringify(activePursuits));
+
+      declineSignal(company, title);
+
+      alert(company + " moved to Active Pursuits.");
     }
 
     function declineSignal(tenant, title){
@@ -155,6 +181,9 @@
                 <textarea id="email_${p["Tenant Company"].replace(/[^a-zA-Z0-9]/g, "_")}">${buildMatchedProspectEmail(p["Tenant Company"], s.title)}</textarea>
                 <button onclick="copyMatchedProspectEmail('${p["Tenant Company"]}', '${s.title}')">
                   Copy Email
+                </button>
+                <button onclick="acceptSignal('${p["Tenant Company"]}', '${s.title}')">
+                  Accept Signal → Active Pursuit
                 </button>
               </div>
             `).join("")}
