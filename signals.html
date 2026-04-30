@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <title>Signal Leads</title>
   <style>
+    body {
+    }
+    .pill {
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:linear-gradient(135deg,#2563eb,#7c3aed);
+      font-size:12px;
+      font-weight:800;
+      margin-left:6px;
+    }
     body { margin:0; font-family:Arial; background:#020617; color:white; padding:24px; }
     h1 { margin-top:0; }
     .card {
@@ -54,6 +65,9 @@
       <option value="Downsize / Disposition Signal">Downsize / Disposition</option>
       <option value="Transaction / Real Estate Signal">Transaction / Real Estate</option>
       <option value="Market / News Signal">Market / News</option>
+      <option value="SEC Disposition Signal">SEC Disposition</option>
+      <option value="Probate / Estate Signal">Probate / Estate</option>
+      <option value="Foreclosure / Distress Signal">Foreclosure / Distress</option>
     </select>
 
     <label>Prospect</label>
@@ -137,11 +151,44 @@
     }
 
     function getSignalType(title){
-      const text = title.toLowerCase();
+      const text = (title || "").toLowerCase();
 
+      // --- Public record signals ---
+      if(text.includes("10-k") || text.includes("10k") || text.includes("sec") || text.includes("divest") || text.includes("disposition") || text.includes("asset sale")){
+        return "SEC Disposition Signal";
+      }
+
+      if(text.includes("probate") || text.includes("estate") || text.includes("executor") || text.includes("inheritance")){
+        return "Probate / Estate Signal";
+      }
+
+      if(text.includes("foreclosure") || text.includes("lis pendens") || text.includes("notice of default") || text.includes("default") || text.includes("nod")){
+        return "Foreclosure / Distress Signal";
+      }
+
+      // --- Existing signals ---
       if(text.includes("expansion") || text.includes("opening") || text.includes("growth")) {
         return "Expansion / Growth Signal";
       }
+
+      if(text.includes("hiring") || text.includes("jobs")) {
+        return "Hiring / Headcount Signal";
+      }
+
+      if(text.includes("permit") || text.includes("construction") || text.includes("development")) {
+        return "Permit / Development Signal";
+      }
+
+      if(text.includes("downsize") || text.includes("layoff") || text.includes("closure")) {
+        return "Downsize / Disposition Signal";
+      }
+
+      if(text.includes("lease") || text.includes("sale") || text.includes("acquisition")) {
+        return "Transaction / Real Estate Signal";
+      }
+
+      return "Market / News Signal";
+    }
 
       if(text.includes("hiring") || text.includes("jobs")) {
         return "Hiring / Headcount Signal";
@@ -232,7 +279,7 @@
       ` + list.map(s => `
         <div class="card">
           <h2>${s.tenant}</h2>
-          <p><strong>Signal Type:</strong> ${getSignalType(s.title)}</p>
+          <p><strong>Signal Type:</strong> <span class="pill">${getSignalType(s.title)}</span></p>
           <p><strong>What triggered this:</strong> ${s.title}</p>
           <p><strong>Why this prospect:</strong> ${getProspectWhy(s)}</p>
           <p><a href="${s.link}" target="_blank">Open Signal</a></p>
