@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Signal Leads</title>
+  <style>
+    body { margin:0; font-family:Arial; background:#020617; color:white; padding:24px; }
+    h1 { margin-top:0; }
+    .card {
+      background:linear-gradient(135deg, rgba(30,41,59,.9), rgba(15,23,42,.8));
+      border:1px solid rgba(148,163,184,.25);
+      border-radius:20px;
+      padding:18px;
+      margin-bottom:14px;
+    }
+    input {
+      width:100%;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid #334155;
+      background:#0f172a;
+      color:white;
+      margin-bottom:18px;
+    }
+    button {
+      padding:10px 14px;
+      border-radius:12px;
+      border:0;
+      background:linear-gradient(135deg,#2563eb,#7c3aed);
+      color:white;
+      font-weight:800;
+      cursor:pointer;
+    }
+    a { color:#93c5fd; }
+  </style>
+</head>
+<body>
+  <h1>⚡ Signal Leads</h1>
+  <p>Organized list of signal-based outreach opportunities.</p>
+
+  <input id="search" placeholder="Search signal, tenant, keyword..." oninput="renderSignals()">
+
+  <div id="signals"></div>
+
+  <script>
+    const sampleSignals = [
+      {
+        tenant: "National Waterproofing Supply",
+        score: 75,
+        priority: "HIGH",
+        title: "National Waterproofing Supply expansion opportunity in Tampa",
+        link: "https://www.google.com/search?q=National+Waterproofing+Supply+Tampa+expansion"
+      }
+    ];
+
+    function renderSignals(){
+      const q = document.getElementById("search").value.toLowerCase();
+      const list = sampleSignals.filter(s =>
+        s.tenant.toLowerCase().includes(q) ||
+        s.title.toLowerCase().includes(q) ||
+        s.priority.toLowerCase().includes(q)
+      );
+
+      document.getElementById("signals").innerHTML = list.map(s => `
+        <div class="card">
+          <h2>${s.tenant}</h2>
+          <p><strong>Priority:</strong> ${s.priority}</p>
+          <p><strong>Signal Score:</strong> ${s.score}</p>
+          <p><strong>Reason:</strong> ${s.title}</p>
+          <p><a href="${s.link}" target="_blank">Open Signal</a></p>
+          <button onclick="copyEmail('${s.tenant}', '${s.title}')">Copy Outreach Email</button>
+        </div>
+      `).join("");
+    }
+
+    function copyEmail(tenant, title){
+      const email = `Subject: Quick note on ${tenant}
+
+Hi,
+
+I came across this recent signal and thought it may be relevant:
+
+"${title}"
+
+I work in commercial real estate in Tampa and help companies evaluate expansion, relocation, lease strategy, and market opportunities.
+
+Are you the right person to speak with about real estate decisions for ${tenant}?
+
+Best,
+Connor`;
+
+      navigator.clipboard.writeText(email);
+      alert("Email copied.");
+    }
+
+    renderSignals();
+  </script>
+</body>
+</html>
