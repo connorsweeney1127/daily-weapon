@@ -148,12 +148,54 @@
           <p><a href="${s.link}" target="_blank">Open Signal</a></p>
           <div class="note">
             <strong>Matched Prospects:</strong>
-            ${matchProspects(s).map(p => `<div>• ${p["Tenant Company"]}</div>`).join("")}
+            ${matchProspects(s).map(p => `
+              <div style="margin-top:10px; padding:10px; border:1px solid #334155; border-radius:12px;">
+                <strong>${p["Tenant Company"]}</strong><br>
+                <span>${p["Address"] || ""}</span><br>
+                <button onclick="copyMatchedProspectEmail('${p["Tenant Company"]}', '${s.title}')">
+                  Generate Email
+                </button>
+              </div>
+            `).join("")}
           </div>
           <button onclick="copyEmail('${s.tenant}', '${s.title}')">Copy Outreach Email</button>
           <button onclick="declineSignal('${s.tenant}', '${s.title}')">Decline Signal</button>
         </div>
       `).join("");
+    }
+
+    function copyMatchedProspectEmail(company, title){
+      const prospect = prospects.find(p =>
+        String(p["Tenant Company"] || "").toLowerCase() === String(company || "").toLowerCase()
+      ) || {};
+
+      const contact = prospect["Local Contact"] || "[No contact found]";
+      const emailAddress = prospect["Email"] || "[No email found]";
+      const firstName = contact !== "[No contact found]" ? contact.split(" ")[0] : "there";
+
+      const email = `Contact: ${contact}
+Email: ${emailAddress}
+Company: ${company}
+
+Subject: Quick note on ${company}
+
+Hi ${firstName},
+
+I came across this signal and thought it may be relevant:
+
+"${title}"
+
+I work in commercial real estate in Tampa and help companies evaluate expansion, relocation, lease strategy, and market opportunities.
+
+Given what I saw, I thought it could be worth connecting in case there is any upcoming real estate need, lease decision, or market planning discussion.
+
+Are you the right person to speak with about real estate decisions for ${company}?
+
+Best,
+Connor`;
+
+      navigator.clipboard.writeText(email);
+      alert("Email copied for " + company);
     }
 
     function copyEmail(tenant, title){
