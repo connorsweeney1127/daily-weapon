@@ -712,7 +712,18 @@ Connor`
         }
       };
 
-      return templates[strategy] || templates.coldIntro;
+      const selected = templates[strategy] || templates.coldIntro;
+
+      const header = `Contact: ${contact}
+Email: ${clean(t["Email"]) || "[No email found]"}
+Company: ${tenant}
+
+`;
+
+      return {
+        subject: selected.subject,
+        body: header + selected.body
+      };
     }
 
     function filterProspects(){
@@ -1795,7 +1806,18 @@ Connor`
         }
       };
 
-      return templates[strategy] || templates.coldIntro;
+      const selected = templates[strategy] || templates.coldIntro;
+
+      const header = `Contact: ${contact}
+Email: ${clean(t["Email"]) || "[No email found]"}
+Company: ${tenant}
+
+`;
+
+      return {
+        subject: selected.subject,
+        body: header + selected.body
+      };
     }
 
     function filterProspects(){
