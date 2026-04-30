@@ -43,6 +43,8 @@
   <div id="signals"></div>
 
   <script>
+    let declinedSignals = JSON.parse(localStorage.getItem("declinedSignals") || "[]");
+
     const sampleSignals = [
       {
         tenant: "National Waterproofing Supply",
@@ -53,13 +55,28 @@
       }
     ];
 
+    function signalId(s){
+      return `${s.tenant}::${s.title}`;
+    }
+
+    function declineSignal(tenant, title){
+      const id = `${tenant}::${title}`;
+      if(!declinedSignals.includes(id)){
+        declinedSignals.push(id);
+        localStorage.setItem("declinedSignals", JSON.stringify(declinedSignals));
+      }
+      renderSignals();
+    }
+
     function renderSignals(){
       const q = document.getElementById("search").value.toLowerCase();
-      const list = sampleSignals.filter(s =>
-        s.tenant.toLowerCase().includes(q) ||
-        s.title.toLowerCase().includes(q) ||
-        s.priority.toLowerCase().includes(q)
-      );
+      const list = sampleSignals
+        .filter(s => !declinedSignals.includes(signalId(s)))
+        .filter(s =>
+          s.tenant.toLowerCase().includes(q) ||
+          s.title.toLowerCase().includes(q) ||
+          s.priority.toLowerCase().includes(q)
+        );
 
       document.getElementById("signals").innerHTML = list.map(s => `
         <div class="card">
@@ -69,6 +86,7 @@
           <p><strong>Reason:</strong> ${s.title}</p>
           <p><a href="${s.link}" target="_blank">Open Signal</a></p>
           <button onclick="copyEmail('${s.tenant}', '${s.title}')">Copy Outreach Email</button>
+          <button onclick="declineSignal('${s.tenant}', '${s.title}')">Decline Signal</button>
         </div>
       `).join("");
     }
