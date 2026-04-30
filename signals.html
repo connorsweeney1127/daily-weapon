@@ -317,7 +317,15 @@
       const emailAddress = prospect["Email"] || "[No email found]";
       const firstName = contact !== "[No contact found]" ? contact.split(" ")[0] : "there";
 
-      return `Contact: ${contact}
+      const type = getSignalType(title);
+
+let strategy = "marketInsight";
+
+if(type === "SEC Disposition Signal") strategy = "secDisposition";
+if(type === "Probate / Estate Signal") strategy = "probateEstate";
+if(type === "Foreclosure / Distress Signal") strategy = "foreclosureDistress";
+
+return `Contact: ${contact}
 Email: ${emailAddress}
 Company: ${company}
 
