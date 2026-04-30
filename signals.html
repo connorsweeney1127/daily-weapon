@@ -13,6 +13,8 @@
       padding:18px;
       margin-bottom:14px;
     }
+    textarea { width:100%; min-height:360px; resize:vertical; margin-top:12px; background:#0f172a; color:white; border:1px solid #334155; border-radius:12px; padding:12px; }
+    .action-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
     input {
       width:100%;
       padding:12px;
@@ -179,12 +181,15 @@
                 <strong>${p["Tenant Company"]}</strong><br>
                 <span>${p["Address"] || ""}</span><br>
                 <textarea id="email_${p["Tenant Company"].replace(/[^a-zA-Z0-9]/g, "_")}">${buildMatchedProspectEmail(p["Tenant Company"], s.title)}</textarea>
-                <button onclick="copyMatchedProspectEmail('${p["Tenant Company"]}', '${s.title}')">
-                  Copy Email
-                </button>
-                <button onclick="acceptSignal('${p["Tenant Company"]}', '${s.title}')">
-                  Accept Signal → Active Pursuit
-                </button>
+
+                <div class="action-row">
+                  <button onclick="copyMatchedProspectEmail('${p["Tenant Company"]}', '${s.title}')">
+                    Copy Email
+                  </button>
+                  <button onclick="acceptSignal('${p["Tenant Company"]}', '${s.title}')">
+                    Accept Signal → Active Pursuit
+                  </button>
+                </div>
               </div>
             `).join("")}
           </div>
