@@ -57,6 +57,8 @@
     <option>Meeting</option>
     <option>Negotiating</option>
   </select>
+  <input id="newFollowup" type="date">
+
   <select id="newBucket">
     <option value="today">Today</option>
     <option value="week">This Week</option>
@@ -89,6 +91,12 @@ function save(){
   localStorage.setItem("activePursuits", JSON.stringify(pursuits));
 }
 
+function defaultFollowupDate(){
+  const d = new Date();
+  d.setDate(d.getDate() + 2);
+  return d.toISOString().split("T")[0];
+}
+
 function addPursuit(){
   const p = {
     company: document.getElementById("newCompany").value,
@@ -97,6 +105,7 @@ function addPursuit(){
     source: document.getElementById("newSource").value,
     stage: document.getElementById("newStage").value,
     bucket: document.getElementById("newBucket").value,
+    followup: document.getElementById("newFollowup").value || defaultFollowupDate(),
     notes: ""
   };
   pursuits.push(p);
@@ -129,6 +138,8 @@ function render(){
         <option ${p.stage==="Meeting"?"selected":""}>Meeting</option>
         <option ${p.stage==="Negotiating"?"selected":""}>Negotiating</option>
       </select>
+      <label>Follow-up</label>
+      <input type="date" value="${p.followup || defaultFollowupDate()}" onchange="pursuits[${i}].followup=this.value; save(); render();">
       <textarea onchange="pursuits[${i}].notes=this.value; save();">${p.notes||""}</textarea>
       <button onclick="move(${i},'today')">Today</button>
       <button onclick="move(${i},'week')">Week</button>

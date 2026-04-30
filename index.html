@@ -894,6 +894,10 @@ function useSignalForOutreachByTenant(tenantName){
       const meetings = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting").length;
       const deals = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal").length;
       const activePursuits = JSON.parse(localStorage.getItem("activePursuits") || "[]");
+      const todayDate = new Date().toISOString().split("T")[0];
+      const pursuitFollowupsToday = activePursuits.filter(p => p.followup === todayDate).length;
+      const pursuitMeetings = activePursuits.filter(p => (p.stage || "").toLowerCase().includes("meeting")).length;
+      const pursuitWeek = activePursuits.filter(p => (p.bucket || "week") === "week").length;
       const top = [...tenants].sort(pipelineSort).slice(0, 15);
       const today = new Date().toISOString().split("T")[0];
 
@@ -927,12 +931,12 @@ function useSignalForOutreachByTenant(tenantName){
 
             <div class="agent" onclick="scrollToPipeline()" style="cursor:pointer;">
               <strong>Follow-ups</strong>
-              <span class="pill">10</span>
+              <span class="pill">${10 + pursuitFollowupsToday}</span>
             </div>
 
             <div class="agent" onclick="scrollToPipeline()" style="cursor:pointer;">
               <strong>Meeting Prep</strong>
-              <span class="pill">2</span>
+              <span class="pill">${2 + pursuitMeetings}</span>
             </div>
 
             <div class="agent" onclick="refreshSignals()" style="cursor:pointer;">
@@ -2002,6 +2006,10 @@ function useSignalForOutreachByTenant(tenantName){
       const meetings = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Meeting").length;
       const deals = tenants.filter(t => (pipeline[t["Tenant Company"]] || "Not Contacted") === "Deal").length;
       const activePursuits = JSON.parse(localStorage.getItem("activePursuits") || "[]");
+      const todayDate = new Date().toISOString().split("T")[0];
+      const pursuitFollowupsToday = activePursuits.filter(p => p.followup === todayDate).length;
+      const pursuitMeetings = activePursuits.filter(p => (p.stage || "").toLowerCase().includes("meeting")).length;
+      const pursuitWeek = activePursuits.filter(p => (p.bucket || "week") === "week").length;
       const top = [...tenants].sort(pipelineSort).slice(0, 15);
       const today = new Date().toISOString().split("T")[0];
 
@@ -2035,12 +2043,12 @@ function useSignalForOutreachByTenant(tenantName){
 
             <div class="agent" onclick="scrollToPipeline()" style="cursor:pointer;">
               <strong>Follow-ups</strong>
-              <span class="pill">10</span>
+              <span class="pill">${10 + pursuitFollowupsToday}</span>
             </div>
 
             <div class="agent" onclick="scrollToPipeline()" style="cursor:pointer;">
               <strong>Meeting Prep</strong>
-              <span class="pill">2</span>
+              <span class="pill">${2 + pursuitMeetings}</span>
             </div>
 
             <div class="agent" onclick="refreshSignals()" style="cursor:pointer;">

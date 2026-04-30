@@ -104,6 +104,12 @@
       return `${s.tenant}::${s.title}`;
     }
 
+    function defaultFollowupDate(){
+      const d = new Date();
+      d.setDate(d.getDate() + 2);
+      return d.toISOString().split("T")[0];
+    }
+
     function acceptSignal(company, title){
       const prospect = prospects.find(p =>
         String(p["Tenant Company"] || "").toLowerCase() === String(company || "").toLowerCase()
@@ -116,7 +122,9 @@
         address: prospect["Address"] || "",
         signal: title,
         status: "Active Pursuit",
-        followup: "",
+        bucket: "week",
+        source: "Signal Lead",
+        followup: defaultFollowupDate(),
         notes: "Accepted from Signal Leads",
         createdAt: new Date().toISOString()
       };
