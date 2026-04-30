@@ -43,6 +43,7 @@
   <div id="signals"></div>
 
   <script>
+    let prospects = [];
     let declinedSignals = JSON.parse(localStorage.getItem("declinedSignals") || "[]");
 
     const sampleSignals = [
@@ -65,7 +66,13 @@
         declinedSignals.push(id);
         localStorage.setItem("declinedSignals", JSON.stringify(declinedSignals));
       }
-      renderSignals();
+      fetch("data.json")
+      .then(res => res.json())
+      .then(data => {
+        prospects = data;
+        renderSignals();
+      })
+      .catch(() => renderSignals());
     }
 
     function getSignalType(title){
@@ -141,7 +148,13 @@ Connor`;
       alert("Email copied.");
     }
 
-    renderSignals();
+    fetch("data.json")
+      .then(res => res.json())
+      .then(data => {
+        prospects = data;
+        renderSignals();
+      })
+      .catch(() => renderSignals());
   </script>
 </body>
 </html>
