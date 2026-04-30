@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Active Pursuits</title>
+  <style>
+    body { margin:0; font-family:Arial; background:#020617; color:white; padding:24px; }
+    h1 { margin-top:0; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .column { background:#0f172a; border-radius:16px; padding:16px; }
+    .card {
+      background:linear-gradient(135deg, rgba(30,41,59,.9), rgba(15,23,42,.8));
+      border:1px solid rgba(148,163,184,.25);
+      border-radius:14px;
+      padding:12px;
+      margin-bottom:10px;
+    }
+    input, select, textarea {
+      width:100%;
+      margin-top:6px;
+      margin-bottom:10px;
+      padding:8px;
+      border-radius:8px;
+      border:1px solid #334155;
+      background:#020617;
+      color:white;
+    }
+    button {
+      padding:8px 10px;
+      border-radius:10px;
+      border:0;
+      background:linear-gradient(135deg,#2563eb,#7c3aed);
+      color:white;
+      font-weight:700;
+      cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎯 Active Pursuits Workboard</h1>
+
+<div>
+  <input id="newCompany" placeholder="Company">
+  <input id="newContact" placeholder="Contact">
+  <input id="newEmail" placeholder="Email">
+  <select id="newSource">
+    <option>Regular Outreach</option>
+    <option>Signal Lead</option>
+    <option>Client Requirement</option>
+    <option>Investor</option>
+  </select>
+  <select id="newStage">
+    <option>New</option>
+    <option>Contacted</option>
+    <option>Follow-Up</option>
+    <option>Meeting</option>
+    <option>Negotiating</option>
+  </select>
+  <select id="newBucket">
+    <option value="today">Today</option>
+    <option value="week">This Week</option>
+    <option value="later">Watchlist</option>
+  </select>
+  <button onclick="addPursuit()">Add Pursuit</button>
+</div>
+
+<hr>
+
+<div class="grid">
+  <div class="column">
+    <h2>Today</h2>
+    <div id="today"></div>
+  </div>
+  <div class="column">
+    <h2>This Week</h2>
+    <div id="week"></div>
+  </div>
+  <div class="column">
+    <h2>Watchlist</h2>
+    <div id="later"></div>
+  </div>
+</div>
+
+<script>
+let pursuits = JSON.parse(localStorage.getItem("activePursuits") || "[]");
+
+function save(){
+  localStorage.setItem("activePursuits", JSON.stringify(pursuits));
+}
+
+function addPursuit(){
+  const p = {
+    company: document.getElementById("newCompany").value,
+    contact: document.getElementById("newContact").value,
+    email: document.getElementById("newEmail").value,
+    source: document.getElementById("newSource").value,
+    stage: document.getElementById("newStage").value,
+    bucket: document.getElementById("newBucket").value,
+    notes: ""
+  };
+  pursuits.push(p);
+  save();
+  render();
+}
+
+function move(i, bucket){
+  pursuits[i].bucket = bucket;
+  save();
+  render();
+}
+
+function render(){
+  ["today","week","later"].forEach(b => {
+    document.getElementById(b).innerHTML = "";
+  });
+
+  pursuits.forEach((p,i) => {
+    const el = document.createElement("div");
+    el.className = "card";
+    el.innerHTML = `
+      <strong>${p.company}</strong><br>
+      ${p.contact || ""} ${p.email || ""}<br>
+      <em>${p.source}</em><br>
+      <select onchange="pursuits[${i}].stage=this.value; save();">
+        <option ${p.stage==="New"?"selected":""}>New</option>
+        <option ${p.stage==="Contacted"?"selected":""}>Contacted</option>
+        <option ${p.stage==="Follow-Up"?"selected":""}>Follow-Up</option>
+        <option ${p.stage==="Meeting"?"selected":""}>Meeting</option>
+        <option ${p.stage==="Negotiating"?"selected":""}>Negotiating</option>
+      </select>
+      <textarea onchange="pursuits[${i}].notes=this.value; save();">${p.notes||""}</textarea>
+      <button onclick="move(${i},'today')">Today</button>
+      <button onclick="move(${i},'week')">Week</button>
+      <button onclick="move(${i},'later')">Later</button>
+    `;
+    document.getElementById(p.bucket || "week").appendChild(el);
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
