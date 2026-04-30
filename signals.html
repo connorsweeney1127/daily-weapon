@@ -70,7 +70,13 @@
       .then(res => res.json())
       .then(data => {
         prospects = data;
+        fetch("data.json")
+      .then(res => res.json())
+      .then(data => {
+        prospects = data;
         renderSignals();
+      })
+      .catch(() => renderSignals());
       })
       .catch(() => renderSignals());
     }
@@ -129,9 +135,21 @@
     }
 
     function copyEmail(tenant, title){
-      const email = `Subject: Quick note on ${tenant}
+      const prospect = prospects.find(p =>
+        String(p["Tenant Company"] || "").toLowerCase() === String(tenant || "").toLowerCase()
+      ) || {};
 
-Hi,
+      const contact = prospect["Local Contact"] || "[No contact found]";
+      const emailAddress = prospect["Email"] || "[No email found]";
+      const firstName = contact !== "[No contact found]" ? contact.split(" ")[0] : "there";
+
+      const email = `Contact: ${contact}
+Email: ${emailAddress}
+Company: ${tenant}
+
+Subject: Quick note on ${tenant}
+
+Hi ${firstName},
 
 I came across this recent signal and thought it may be relevant:
 
@@ -152,7 +170,13 @@ Connor`;
       .then(res => res.json())
       .then(data => {
         prospects = data;
+        fetch("data.json")
+      .then(res => res.json())
+      .then(data => {
+        prospects = data;
         renderSignals();
+      })
+      .catch(() => renderSignals());
       })
       .catch(() => renderSignals());
   </script>
