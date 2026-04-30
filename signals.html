@@ -49,7 +49,9 @@
     let declinedSignals = JSON.parse(localStorage.getItem("declinedSignals") || "[]");
     let activePursuits = JSON.parse(localStorage.getItem("activePursuits") || "[]");
 
-    const sampleSignals = [
+    let savedSignals = JSON.parse(localStorage.getItem("matchedSignals") || "[]");
+
+    const sampleSignals = savedSignals.length ? savedSignals : [
       {
         tenant: "National Waterproofing Supply",
         score: 75,
@@ -158,8 +160,10 @@
     }
 
     function renderSignals(){
+      savedSignals = JSON.parse(localStorage.getItem("matchedSignals") || "[]");
+      const activeSignals = savedSignals.length ? savedSignals : sampleSignals;
       const q = document.getElementById("search").value.toLowerCase();
-      const list = sampleSignals
+      const list = activeSignals
         .filter(s => !declinedSignals.includes(signalId(s)))
         .filter(s =>
           s.tenant.toLowerCase().includes(q) ||

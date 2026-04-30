@@ -392,6 +392,7 @@ Connor`;
             });
           });
           matchedSignals.sort((a,b) => b.signalScore - a.signalScore);
+          localStorage.setItem("matchedSignals", JSON.stringify(matchedSignals));
           render();
         })
         .catch(() => {
@@ -1438,6 +1439,7 @@ Connor`;
             });
           });
           matchedSignals.sort((a,b) => b.signalScore - a.signalScore);
+          localStorage.setItem("matchedSignals", JSON.stringify(matchedSignals));
           render();
         })
         .catch(() => {
