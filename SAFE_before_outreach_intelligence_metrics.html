@@ -326,26 +326,6 @@
     @media(max-width:1100px){.owner-lookup-grid{grid-template-columns:1fr}.signal-app-grid{grid-template-columns:repeat(2,1fr)}.metrics,.brain-strip,.task-bucket-grid{grid-template-columns:repeat(2,1fr)}.apps-grid{grid-template-columns:repeat(4,1fr)}.topbar{align-items:flex-start;flex-direction:column}.two-col,.three-col{grid-template-columns:1fr}}@media(max-width:700px){.agent-mini-grid,.signal-app-grid{grid-template-columns:1fr}.shell{width:min(100% - 24px,1320px)}.metrics,.brain-strip,.task-bucket-grid{grid-template-columns:1fr}.apps-grid{grid-template-columns:repeat(2,1fr)}.queue-top{flex-direction:column}}
   
 </style>
-
-<style id="metric-cleanup-style">
-  .metric input,
-  .metric select,
-  .metric-card input,
-  .metric-card select {
-    display: none !important;
-  }
-
-  .metric,
-  .metric-card {
-    text-align: center !important;
-  }
-
-  .metric .value,
-  .metric-card .value {
-    text-align: center !important;
-  }
-</style>
-
 </head>
 <body>
 <main class="shell">
@@ -369,34 +349,34 @@
     </article>
 
     <article class="metric-card">
-      <div class="metric-label">SF Leased / Sold</div>
+      <div class="metric-label">SF Leased</div>
       <div class="metric-value" id="sfLeasedValue">0</div>
       <input id="sfLeasedInput" type="number" value="0" />
     </article>
 
     <article class="metric-card">
-      <div class="metric-label">Listings</div>
+      <div class="metric-label">SF Sold</div>
       <div class="metric-value" id="sfSoldValue">0</div>
       <input id="sfSoldInput" type="number" value="0" />
     </article>
   </section>
 
-  <div class="metric-section-title">Deal Tracker</div>
+  <div class="metric-section-title">Active 2026 Pipeline</div>
   <section class="metrics two-row">
     <article class="metric-card">
-      <div class="metric-label">Total Outreach</div>
-      <div class="metric-value" id="activeTotal OutreachValue">0</div>
+      <div class="metric-label">Pursuits</div>
+      <div class="metric-value" id="activePursuitsValue">0</div>
     </article>
 
     <article class="metric-card">
-      <div class="metric-label">Conversion Rate</div>
-      <div class="metric-value" id="activeTransactionsValue" data-live-transaction-card="true">0</div>
+      <div class="metric-label">Active Transactions</div>
+      <div class="metric-value" id="activeTransactionsValue">0</div>
       <input id="activeTransactionsInput" type="number" value="0" />
     </article>
 
     <article class="metric-card">
-      <div class="metric-label">Live Transactions</div>
-      <div class="metric-value" id="liveTransactionsValue">0</div>
+      <div class="metric-label">Active Listings</div>
+      <div class="metric-value" id="activeListingsValue">0</div>
       <input id="activeListingsInput" type="number" value="0" />
     </article>
 
@@ -669,137 +649,19 @@ function generateDailyCommandQueue(){
 
 function renderAgentBoard(){ return ``; }
 
-
 function refreshAll(){
+  const activePursuits = Brain.prospects.filter(p => p.stage !== "Deal").length;
+  if(document.getElementById("activePursuitsValue")) activePursuitsValue.textContent = activePursuits;
 
-  const totalOutreach = (Brain.completedOutreach || []).length;
-
-  const prospectResponses = (Brain.completedOutreach || []).filter(x => {
-    const txt = String(
-      (x.outcome || "") + " " +
-      (x.completedNote || "") + " " +
-      (x.responseStatus || "")
-    ).toLowerCase();
-
-    return txt.includes("response")
-      || txt.includes("responded")
-      || txt.includes("reply")
-      || txt.includes("replied");
-  }).length;
-
-  const conversionRate = totalOutreach
-    ? ((prospectResponses / totalOutreach) * 100).toFixed(1)
-    : "0.0";
-
-  if(document.getElementById("activePursuitsValue")){
-    activePursuitsValue.textContent = totalOutreach;
-  }
-
-  if(document.getElementById("transactionsCompletedInput")){
-    transactionsCompletedValue.textContent =
-      transactionsCompletedInput.value || "0";
-  }
-
-  if(document.getElementById("totalRevenueInput")){
-    totalRevenueValue.textContent =
-      "$" + Number(totalRevenueInput.value || 0).toLocaleString();
-  }
-
-  if(document.getElementById("sfLeasedInput")){
-    sfLeasedValue.textContent =
-      Number(sfLeasedInput.value || 0).toLocaleString();
-  }
-
-  if(document.getElementById("sfSoldInput")){
-    sfSoldValue.textContent =
-      Number(sfSoldInput.value || 0).toLocaleString();
-  }
-
-  if(document.getElementById("activeTransactionsValue")){
-    activeTransactionsValue.innerHTML = `
-  <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-top:8px;">
-
-    <div style="text-align:center;min-width:90px;">
-      <div style="font-size:11px;color:#cbd5e1;letter-spacing:1px;font-weight:800;">
-        RESPONSE #
-      </div>
-
-      <div style="font-size:34px;font-weight:950;line-height:1.1;margin-top:8px;">
-        ${prospectResponses}
-      </div>
-    </div>
-
-    <div style="width:1px;height:54px;background:rgba(255,255,255,.22);"></div>
-
-    <div style="text-align:center;min-width:100px;">
-      <div style="font-size:11px;color:#cbd5e1;letter-spacing:1px;font-weight:800;">
-        CONVERSION %
-      </div>
-
-      <div style="font-size:34px;font-weight:950;line-height:1.1;margin-top:8px;">
-        ${conversionRate}%
-      </div>
-    </div>
-
-  </div>
-`;
-  }
-
-  // LIVE CRM METRICS
-  const listingsCount = Brain.prospects.filter(p =>
-    String(p.sourceTab || "").toLowerCase().includes("listing")
-  ).length;
-
-  const liveTransactions = Brain.prospects.filter(p =>
-    String(p.sourceTab || "").toLowerCase().includes("live transaction")
-  );
-
-  const liveTransactionCount = liveTransactions.length;
-
-  const closings2026 = liveTransactions.filter(p => {
-    const txt = String(
-      p.expectedClosingDate ||
-      p["Expected Closing Date"] ||
-      p.notes ||
-      ""
-    );
-
-    return txt.includes("2026");
-  }).length;
-
-  if(document.getElementById("activeListingsValue")){
-    activeListingsValue.textContent = listingsCount;
-  }
-
-  if(document.getElementById("liveTransactionsValue")){
-    liveTransactionsValue.textContent = liveTransactionCount;
-  }
-
-  const liveTransactionMetric =
-    document.querySelector('[data-live-transaction-card="true"]');
-
-  if(liveTransactionMetric){
-    liveTransactionMetric.setAttribute(
-      "data-live-count",
-      liveTransactionCount
-    );
-  }
-
-  if(document.getElementById("potentialClosingsValue")){
-    potentialClosingsValue.textContent = closings2026;
-  }
-
-  if(document.getElementById("sfSoldValue")){
-    sfSoldValue.textContent = listingsCount;
-  }
-
-  Brain.prospects.forEach(p => {
-    p.autoTags = autoStrategyTags(p);
-  });
-
+  if(document.getElementById("transactionsCompletedInput")) transactionsCompletedValue.textContent = transactionsCompletedInput.value || "0";
+  if(document.getElementById("totalRevenueInput")) totalRevenueValue.textContent = "$" + Number(totalRevenueInput.value || 0).toLocaleString();
+  if(document.getElementById("sfLeasedInput")) sfLeasedValue.textContent = Number(sfLeasedInput.value || 0).toLocaleString();
+  if(document.getElementById("sfSoldInput")) sfSoldValue.textContent = Number(sfSoldInput.value || 0).toLocaleString();
+  if(document.getElementById("activeTransactionsInput")) activeTransactionsValue.textContent = activeTransactionsInput.value || "0";
+  if(document.getElementById("activeListingsInput")) activeListingsValue.textContent = activeListingsInput.value || "0";
+  if(document.getElementById("potentialClosingsInput")) potentialClosingsValue.textContent = potentialClosingsInput.value || "0";
   brainStrip.innerHTML = renderAgentBoard();
 }
-
 
 function openWorkspace(title, subhead, body){
   workspaceTitle.textContent = title;
@@ -1789,16 +1651,7 @@ function outreachTableRowHTML(q){
       <td>${contactOptionsHTML(q)}</td>
       <td>
         ${touchSequenceHTML(q)}
-        <div style="margin-top:6px;">
-          <span class="badge high">Suggested: ${esc(recommendedTemplateForQueue(q))}</span>
-        </div>
-        <div style="margin-top:6px;">
-          ${(Brain.prospects.find(p => p.id === q.prospectId)?.autoTags || [])
-            .map(t => `<span class="badge">${esc(t)}</span>`).join(" ")}
-        </div>
-        <div style="margin-top:8px;">
-          ${templateDropdownHTML(q)}
-        </div>
+        ${templateDropdownHTML(q)}
       </td>
       <td>
         <span class="badge ${simpleSourceLabel(q)==='Signal'?'high':''}">${esc(simpleSourceLabel(q))}</span>
@@ -2071,82 +1924,6 @@ function followUpLabelForTouch(touchCount){
   return "Monthly nurture touch complete — next touch in 30 days";
 }
 
-function autoStrategyTags(prospect){
-  const text = [
-    prospect.company,
-    prospect.notes,
-    prospect.tags,
-    prospect.stage,
-    prospect.reason,
-    prospect.sourceTab,
-    prospect.nextStep,
-    prospect.property
-  ].join(" ").toLowerCase();
-
-  const tags = [];
-
-  if(text.includes("lease") || text.includes("tenant")) tags.push("tenant rep");
-  if(text.includes("sale") || text.includes("investor") || text.includes("owner")) tags.push("investment sale");
-  if(text.includes("sale leaseback") || text.includes("slb")) tags.push("sale-leaseback");
-  if(text.includes("distress") || text.includes("foreclosure") || text.includes("default")) tags.push("distress");
-  if(text.includes("expand") || text.includes("growth") || text.includes("hiring")) tags.push("expansion");
-  if(text.includes("building for sale")) tags.push("building for sale");
-  if(text.includes("manufacturing")) tags.push("manufacturing");
-  if(text.includes("food") || text.includes("beverage") || text.includes("restaurant")) tags.push("food & beverage");
-
-  return [...new Set(tags)];
-}
-
-function recommendedTemplateForQueue(q){
-  const touch = Number(q.touchCount || 0) + 1;
-
-  if(q.strategy === "investmentSale"){
-    if(touch >= 3) return "Investment Sale — Follow Up";
-    return "Investment Sale — Value / Listing";
-  }
-
-  if(q.strategy === "saleLeaseback"){
-    if(touch >= 2) return "Sale-Leaseback — Follow Up";
-    return "Sale-Leaseback";
-  }
-
-  if(q.strategy === "marketInsight"){
-    return "Tenant Rep — Market Insight";
-  }
-
-  if(touch <= 1) return "Tenant Rep — First Touch";
-  if(touch === 2) return "Tenant Rep — Follow Up 1";
-  if(touch === 3) return "Tenant Rep — Follow Up 2";
-
-  return "Tenant Rep — Follow Up 3 / Final Push";
-}
-
-function outreachMetrics(){
-  const completed = Brain.completedOutreach || [];
-
-  const sent = completed.length;
-
-  const responses = completed.filter(x =>
-    String(x.outcome || "").toLowerCase().includes("response") ||
-    String(x.outcome || "").toLowerCase().includes("replied") ||
-    String(x.completedNote || "").toLowerCase().includes("responded")
-  ).length;
-
-  const meetings = completed.filter(x =>
-    String(x.outcome || "").toLowerCase().includes("meeting") ||
-    String(x.completedNote || "").toLowerCase().includes("meeting")
-  ).length;
-
-  const closedDeals = Brain.prospects.filter(p => p.stage === "Deal").length;
-
-  return {
-    sent,
-    responses,
-    meetings,
-    closedDeals
-  };
-}
-
 async function completeOutreachAndScheduleNext(id){
   const item = Brain.outreachQueue.find(q => q.id === id);
   if(!item) return;
@@ -2231,9 +2008,6 @@ async function saveCRMUpdateFromModal(){
     item.completedAt = now.toISOString();
     item.touchCount = newTouchCount;
     item.nextFollowupDate = nextDate;
-    item.lastTemplateUsed = item.strategy || "";
-    item.lastOutreachDate = completedDate;
-    item.responseStatus = "Awaiting Response";
 
     Brain.completedOutreach.unshift({...item, completedDate});
 
@@ -3531,8 +3305,8 @@ function mapHotProspectRows(rows){
 function mapActiveDealRows(rows){
   return (rows || []).map(row => {
     const p = prospectBase({
-      sourceTab:"Live Transactions",
-      agenda:"Live Transactions",
+      sourceTab:"Active Deals",
+      agenda:"Active Deals",
       row,
       company:getRowValue(row,["Company"]),
       property:getRowValue(row,["Address"]),
@@ -3596,7 +3370,7 @@ function syncClosedDealsMetricsFromRows(rows){
 
   const sample = rows.find(r => Object.values(r).some(v => String(v || "").trim())) || rows[0];
   const revenueKey = findMetricKey(sample, ["Total Revenue", "Revenue", "Commission", "Commission Revenue", "Gross Commission", "Fee", "Amount"]);
-  const sfLeasedKey = findMetricKey(sample, ["SF Leased / Sold", "Leased SF", "Square Feet Leased", "Sq Ft Leased", "SF", "Square Feet"]);
+  const sfLeasedKey = findMetricKey(sample, ["SF Leased", "Leased SF", "Square Feet Leased", "Sq Ft Leased", "SF", "Square Feet"]);
   const typeKey = findMetricKey(sample, ["Type", "Transaction Type", "Deal Type"]);
 
   let transactionsCompleted = 0;

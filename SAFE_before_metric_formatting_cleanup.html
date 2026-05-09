@@ -326,26 +326,6 @@
     @media(max-width:1100px){.owner-lookup-grid{grid-template-columns:1fr}.signal-app-grid{grid-template-columns:repeat(2,1fr)}.metrics,.brain-strip,.task-bucket-grid{grid-template-columns:repeat(2,1fr)}.apps-grid{grid-template-columns:repeat(4,1fr)}.topbar{align-items:flex-start;flex-direction:column}.two-col,.three-col{grid-template-columns:1fr}}@media(max-width:700px){.agent-mini-grid,.signal-app-grid{grid-template-columns:1fr}.shell{width:min(100% - 24px,1320px)}.metrics,.brain-strip,.task-bucket-grid{grid-template-columns:1fr}.apps-grid{grid-template-columns:repeat(2,1fr)}.queue-top{flex-direction:column}}
   
 </style>
-
-<style id="metric-cleanup-style">
-  .metric input,
-  .metric select,
-  .metric-card input,
-  .metric-card select {
-    display: none !important;
-  }
-
-  .metric,
-  .metric-card {
-    text-align: center !important;
-  }
-
-  .metric .value,
-  .metric-card .value {
-    text-align: center !important;
-  }
-</style>
-
 </head>
 <body>
 <main class="shell">
@@ -390,13 +370,13 @@
 
     <article class="metric-card">
       <div class="metric-label">Conversion Rate</div>
-      <div class="metric-value" id="activeTransactionsValue" data-live-transaction-card="true">0</div>
+      <div class="metric-value" id="activeTransactionsValue">0</div>
       <input id="activeTransactionsInput" type="number" value="0" />
     </article>
 
     <article class="metric-card">
       <div class="metric-label">Live Transactions</div>
-      <div class="metric-value" id="liveTransactionsValue">0</div>
+      <div class="metric-value" id="activeListingsValue">0</div>
       <input id="activeListingsInput" type="number" value="0" />
     </article>
 
@@ -717,80 +697,32 @@ function refreshAll(){
 
   if(document.getElementById("activeTransactionsValue")){
     activeTransactionsValue.innerHTML = `
-  <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-top:8px;">
-
-    <div style="text-align:center;min-width:90px;">
-      <div style="font-size:11px;color:#cbd5e1;letter-spacing:1px;font-weight:800;">
-        RESPONSE #
-      </div>
-
-      <div style="font-size:34px;font-weight:950;line-height:1.1;margin-top:8px;">
+      <div style="font-size:28px;font-weight:950;">
         ${prospectResponses}
       </div>
-    </div>
 
-    <div style="width:1px;height:54px;background:rgba(255,255,255,.22);"></div>
-
-    <div style="text-align:center;min-width:100px;">
-      <div style="font-size:11px;color:#cbd5e1;letter-spacing:1px;font-weight:800;">
-        CONVERSION %
+      <div style="font-size:12px;color:#cbd5e1;margin-top:6px;">
+        Prospect Responses
       </div>
 
-      <div style="font-size:34px;font-weight:950;line-height:1.1;margin-top:8px;">
+      <div style="font-size:22px;font-weight:950;margin-top:10px;">
         ${conversionRate}%
       </div>
-    </div>
 
-  </div>
-`;
+      <div style="font-size:12px;color:#cbd5e1;margin-top:4px;">
+        Conversion Rate
+      </div>
+    `;
   }
 
-  // LIVE CRM METRICS
-  const listingsCount = Brain.prospects.filter(p =>
-    String(p.sourceTab || "").toLowerCase().includes("listing")
-  ).length;
-
-  const liveTransactions = Brain.prospects.filter(p =>
-    String(p.sourceTab || "").toLowerCase().includes("live transaction")
-  );
-
-  const liveTransactionCount = liveTransactions.length;
-
-  const closings2026 = liveTransactions.filter(p => {
-    const txt = String(
-      p.expectedClosingDate ||
-      p["Expected Closing Date"] ||
-      p.notes ||
-      ""
-    );
-
-    return txt.includes("2026");
-  }).length;
-
-  if(document.getElementById("activeListingsValue")){
-    activeListingsValue.textContent = listingsCount;
+  if(document.getElementById("activeListingsInput")){
+    activeListingsValue.textContent =
+      activeListingsInput.value || "0";
   }
 
-  if(document.getElementById("liveTransactionsValue")){
-    liveTransactionsValue.textContent = liveTransactionCount;
-  }
-
-  const liveTransactionMetric =
-    document.querySelector('[data-live-transaction-card="true"]');
-
-  if(liveTransactionMetric){
-    liveTransactionMetric.setAttribute(
-      "data-live-count",
-      liveTransactionCount
-    );
-  }
-
-  if(document.getElementById("potentialClosingsValue")){
-    potentialClosingsValue.textContent = closings2026;
-  }
-
-  if(document.getElementById("sfSoldValue")){
-    sfSoldValue.textContent = listingsCount;
+  if(document.getElementById("potentialClosingsInput")){
+    potentialClosingsValue.textContent =
+      potentialClosingsInput.value || "0";
   }
 
   Brain.prospects.forEach(p => {
@@ -3531,8 +3463,8 @@ function mapHotProspectRows(rows){
 function mapActiveDealRows(rows){
   return (rows || []).map(row => {
     const p = prospectBase({
-      sourceTab:"Live Transactions",
-      agenda:"Live Transactions",
+      sourceTab:"Active Deals",
+      agenda:"Active Deals",
       row,
       company:getRowValue(row,["Company"]),
       property:getRowValue(row,["Address"]),

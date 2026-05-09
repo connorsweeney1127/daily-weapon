@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Weapon Dashboard</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg: #050914;
+      --panel: rgba(17, 24, 47, 0.84);
+      --border: rgba(148, 163, 184, 0.20);
+      --text: #eef4ff;
+      --muted: #aebbd3;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(14, 165, 233, 0.24), transparent 28%),
+        radial-gradient(circle at 90% 8%, rgba(124, 58, 237, 0.30), transparent 30%),
+        radial-gradient(circle at 52% 94%, rgba(14, 165, 233, 0.14), transparent 28%),
+        linear-gradient(135deg, #071120 0%, #090d1c 45%, #050816 100%);
+    }
+
+    .shell { width: min(1320px, calc(100% - 44px)); margin: 26px auto 34px; }
+
+    .topbar {
+      min-height: 116px;
+      padding: 24px 26px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(18, 25, 50, 0.94), rgba(16, 23, 43, 0.76));
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.34);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand h1 { margin: 0; font-size: 34px; line-height: 1.05; letter-spacing: -1.5px; font-weight: 950; }
+    .brand p { margin: 12px 0 0; color: var(--muted); font-weight: 800; font-size: 15px; }
+
+    .nav-pills { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+    .pill {
+      border: 1px solid rgba(148, 163, 184, 0.20);
+      background: rgba(255, 255, 255, 0.07);
+      color: #dbeafe;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .pill.blue { color: #7dd3fc; background: rgba(14,165,233,.16); border-color: rgba(56,189,248,.24); }
+    .pill.purple { color: #c4b5fd; background: rgba(124,58,237,.18); border-color: rgba(167,139,250,.24); }
+    .pill.green { color: #86efac; background: rgba(34,197,94,.14); border-color: rgba(74,222,128,.24); }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0; }
+    .metric-card {
+      min-height: 174px;
+      border: 1px solid rgba(148,163,184,.22);
+      border-radius: 18px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(30,58,98,.68), rgba(17,24,39,.88));
+      box-shadow: 0 18px 48px rgba(0,0,0,.25);
+    }
+    .metric-card:nth-child(2){ background: linear-gradient(135deg, rgba(67,56,202,.45), rgba(17,24,39,.88)); }
+    .metric-card:nth-child(3){ background: linear-gradient(135deg, rgba(20,83,45,.45), rgba(17,24,39,.88)); }
+    .metric-card:nth-child(4){ background: linear-gradient(135deg, rgba(120,53,15,.35), rgba(17,24,39,.88)); }
+    .metric-label { color: #b6c3da; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 950; }
+    .metric-value { margin-top: 18px; font-size: 38px; line-height: 1; font-weight: 950; letter-spacing: -1px; }
+    .metric-input, input, textarea, select {
+      width: 100%;
+      margin-top: 12px;
+      border: 1px solid rgba(148,163,184,.16);
+      outline: none;
+      border-radius: 12px;
+      padding: 13px 14px;
+      background: rgba(3,7,18,.80);
+      color: #f8fafc;
+      font-weight: 800;
+    }
+    textarea { min-height: 150px; resize: vertical; }
+
+    .apps-panel, .workspace-panel {
+      margin-top: 18px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(18,25,50,.88), rgba(15,23,42,.76));
+      box-shadow: 0 26px 70px rgba(0,0,0,.28);
+    }
+
+    .apps-head, .workspace-head {
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px;
+    }
+    .apps-head h2, .workspace-head h2 { margin: 0; font-size: 21px; letter-spacing: -.4px; }
+    .apps-head p, .workspace-head p { margin: 5px 0 0; color: #b8c3d8; font-size: 13px; font-weight: 700; }
+    .home-pill, button {
+      border: 1px solid rgba(56,189,248,.18);
+      background: rgba(14,165,233,.14);
+      color: #7dd3fc;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      margin: 4px;
+    }
+
+    .apps-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; align-items: stretch; }
+    .app-card {
+      min-height: 176px;
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 16px;
+      padding: 18px;
+      cursor: pointer;
+      background: radial-gradient(circle at 74% 80%, rgba(59,130,246,.28), transparent 24%), linear-gradient(135deg, rgba(30,64,175,.36), rgba(15,23,42,.78));
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .app-card:hover { transform: translateY(-4px); border-color: rgba(125,211,252,.42); box-shadow: 0 22px 48px rgba(0,0,0,.30); }
+    .app-icon { width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center; font-size: 24px; margin-bottom: 26px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.13); }
+    .app-title { font-size: 17px; font-weight: 950; margin-bottom: 10px; }
+    .app-desc { color: #c1cbe0; font-size: 13px; line-height: 1.35; font-weight: 650; }
+    .app-card.news{ background: radial-gradient(circle at 74% 80%, rgba(34,211,238,.24), transparent 24%), linear-gradient(135deg, rgba(8,145,178,.34), rgba(15,23,42,.78)); }
+    .app-card.outreach{ background: radial-gradient(circle at 74% 80%, rgba(167,139,250,.28), transparent 24%), linear-gradient(135deg, rgba(91,33,182,.34), rgba(15,23,42,.78)); }
+    .app-card.signals{ background: radial-gradient(circle at 74% 80%, rgba(244,114,182,.26), transparent 24%), linear-gradient(135deg, rgba(157,23,77,.32), rgba(15,23,42,.78)); }
+    .app-card.market{ background: radial-gradient(circle at 74% 80%, rgba(45,212,191,.24), transparent 24%), linear-gradient(135deg, rgba(15,118,110,.34), rgba(15,23,42,.78)); }
+    .app-card.comp{ background: radial-gradient(circle at 74% 80%, rgba(251,191,36,.23), transparent 24%), linear-gradient(135deg, rgba(146,64,14,.30), rgba(15,23,42,.78)); }
+    .app-card.crm{ background: radial-gradient(circle at 74% 80%, rgba(251,146,60,.24), transparent 24%), linear-gradient(135deg, rgba(113,63,18,.30), rgba(15,23,42,.78)); }
+    .app-card.tasks{ background: radial-gradient(circle at 74% 80%, rgba(74,222,128,.24), transparent 24%), linear-gradient(135deg, rgba(22,101,52,.34), rgba(15,23,42,.78)); }
+    .app-card.models{ background: radial-gradient(circle at 74% 80%, rgba(96,165,250,.24), transparent 24%), linear-gradient(135deg, rgba(30,64,175,.34), rgba(15,23,42,.78)); }
+
+    .brain-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .agent-card {
+      border: 1px solid rgba(148,163,184,.16);
+      background: rgba(3,7,18,.42);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .agent-card strong { display: block; margin-bottom: 6px; }
+    .agent-card div { color: #b8c3d8; font-size: 13px; line-height: 1.35; }
+
+    .workspace-panel { display: none; }
+    .workspace-body {
+      border: 1px solid rgba(148,163,184,.14);
+      background: rgba(3,7,18,.32);
+      border-radius: 18px;
+      padding: 18px;
+    }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .mini-card { border: 1px solid rgba(148,163,184,.14); background: rgba(15,23,42,.66); border-radius: 16px; padding: 16px; }
+    .mini-card h3 { margin: 0 0 8px; }
+    .mini-card p, li { color: #cbd5e1; font-size: 14px; line-height: 1.45; }
+    .footer-note { text-align: center; color: #8fa0bc; font-size: 12px; font-weight: 800; margin-top: 22px; }
+
+    @media (max-width: 1100px) {
+      .metrics, .brain-strip { grid-template-columns: repeat(2, 1fr); }
+      .apps-grid { grid-template-columns: repeat(4, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .nav-pills { justify-content: flex-start; }
+      .two-col, .three-col { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      .shell { width: min(100% - 24px, 1320px); }
+      .metrics, .brain-strip { grid-template-columns: 1fr; }
+      .apps-grid { grid-template-columns: repeat(2, 1fr); }
+      .app-card { min-height: 160px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="shell">
+    <section class="topbar">
+      <div class="brand">
+        <h1>Daily Weapon</h1>
+        <p>CRM Built For Closers</p>
+      </div>
+
+      <div class="nav-pills">
+        <div class="pill">← Home&nbsp;&nbsp;<span style="color:#aebbd3;">dashboard</span></div>
+        <div class="pill blue">Connor Sweeney • CRE Command Center</div>
+        <div class="pill purple">Brain view</div>
+        <div class="pill green" id="liveClock">Loading time...</div>
+      </div>
+    </section>
+
+    <section class="metrics">
+      <article class="metric-card">
+        <div class="metric-label">Deals Closed — 2026</div>
+        <div class="metric-value" id="dealsClosedValue">0</div>
+        <input class="metric-input" id="dealsClosedInput" type="number" value="0" />
+      </article>
+
+      <article class="metric-card">
+        <div class="metric-label">Active Deals</div>
+        <div class="metric-value" id="activeDealsValue">17</div>
+        <input class="metric-input" id="activeDealsInput" type="number" value="17" />
+      </article>
+
+      <article class="metric-card">
+        <div class="metric-label">Active Pursuits</div>
+        <div class="metric-value" id="activePursuitsValue">26</div>
+        <input class="metric-input" id="activePursuitsInput" type="number" value="26" />
+      </article>
+
+      <article class="metric-card">
+        <div class="metric-label">Potential Closings — 2026</div>
+        <div class="metric-value" id="potentialClosingsValue">10</div>
+        <input class="metric-input" id="potentialClosingsInput" type="number" value="10" />
+      </article>
+    </section>
+
+    <section class="apps-panel">
+      <div class="apps-head">
+        <div>
+          <h2>Apps</h2>
+          <p>Tap a section like a home screen app. Each app now reports back to the Daily Weapon Brain.</p>
+        </div>
+        <div class="home-pill" onclick="openBrainSummary()">Brain status</div>
+      </div>
+
+      <div class="apps-grid">
+        <div class="app-card crm" onclick="openApp('crm')">
+          <div class="app-icon">📁</div>
+          <div class="app-title">CRM</div>
+          <div class="app-desc">Prospects, contacts, stages, notes, and deal tracking.</div>
+        </div>
+
+        <div class="app-card tasks" onclick="openApp('tasks')">
+          <div class="app-icon">✅</div>
+          <div class="app-title">Daily Tasks</div>
+          <div class="app-desc">The must-do items your helper should handle every day.</div>
+        </div>
+
+        <div class="app-card outreach" onclick="openApp('outreach')">
+          <div class="app-icon">✉️</div>
+          <div class="app-title">Outreach</div>
+          <div class="app-desc">Draft strategy, subject, first line, and email copy.</div>
+        </div>
+
+        <div class="app-card signals" onclick="openApp('signals')">
+          <div class="app-icon">📍</div>
+          <div class="app-title">Signals</div>
+          <div class="app-desc">Expansion, lease, hiring, permit, distress, and public-record triggers.</div>
+        </div>
+
+        <div class="app-card market" onclick="openApp('market')">
+          <div class="app-icon">📈</div>
+          <div class="app-title">Market Intel</div>
+          <div class="app-desc">Market summaries, trends, and broker angles.</div>
+        </div>
+
+        <div class="app-card news" onclick="openApp('news')">
+          <div class="app-icon">📰</div>
+          <div class="app-title">News</div>
+          <div class="app-desc">News briefs, prospect touch points, and market movement.</div>
+        </div>
+
+        <div class="app-card comp" onclick="openApp('comp')">
+          <div class="app-icon">🏢</div>
+          <div class="app-title">Comp Data</div>
+          <div class="app-desc">Comp requests by market, building type, size, and timing.</div>
+        </div>
+
+        <div class="app-card models" onclick="openApp('models')">
+          <div class="app-icon">💵</div>
+          <div class="app-title">Financial Models</div>
+          <div class="app-desc">Lease spend, sale analysis, commission tracking, and underwriting.</div>
+        </div>
+      </div>
+
+      <div class="brain-strip" id="brainStrip"></div>
+    </section>
+
+    <section class="workspace-panel" id="workspacePanel">
+      <div class="workspace-head">
+        <div>
+          <h2 id="workspaceTitle">Workspace</h2>
+          <p id="workspaceSubhead">Connected to the Daily Weapon Brain.</p>
+        </div>
+        <button onclick="closeWorkspace()">Close Workspace</button>
+      </div>
+      <div class="workspace-body" id="workspaceBody"></div>
+    </section>
+
+    <div class="footer-note">Daily Weapon Brain online.</div>
+  </main>
+
+  <script>
+    const DailyWeaponBrain = {
+      prospects: JSON.parse(localStorage.getItem("dw_prospects") || "[]"),
+      tasks: JSON.parse(localStorage.getItem("dw_tasks") || "[]"),
+      signals: JSON.parse(localStorage.getItem("dw_signals") || "[]"),
+      notes: JSON.parse(localStorage.getItem("dw_notes") || "[]"),
+
+      save() {
+        localStorage.setItem("dw_prospects", JSON.stringify(this.prospects));
+        localStorage.setItem("dw_tasks", JSON.stringify(this.tasks));
+        localStorage.setItem("dw_signals", JSON.stringify(this.signals));
+        localStorage.setItem("dw_notes", JSON.stringify(this.notes));
+      },
+
+      seed() {
+        if (this.prospects.length === 0) {
+          this.prospects = [
+            { company: "Sample Industrial Tenant", contact: "Operations Manager", stage: "New", nextStep: "Cold intro", notes: "Example prospect loaded into CRM." },
+            { company: "Tampa Logistics Co.", contact: "Owner", stage: "Research", nextStep: "Find real estate decision maker", notes: "Potential industrial user." },
+            { company: "Bay Area Manufacturing", contact: "President", stage: "Follow-up", nextStep: "Send market note", notes: "Could need expansion space." }
+          ];
+        }
+
+        if (this.tasks.length === 0) {
+          this.tasks = [
+            { task: "Review top 10 prospects", owner: "CRM Agent", status: "Open" },
+            { task: "Draft 5 outreach emails", owner: "Outreach Agent", status: "Open" },
+            { task: "Check expansion signals", owner: "Signal Agent", status: "Open" }
+          ];
+        }
+
+        if (this.signals.length === 0) {
+          this.signals = [
+            { company: "Bay Area Manufacturing", signal: "Expansion / hiring signal", action: "Create outreach angle" },
+            { company: "Tampa Logistics Co.", signal: "Industrial market fit", action: "Research decision maker" }
+          ];
+        }
+
+        this.save();
+      },
+
+      agents() {
+        return [
+          {
+            name: "CRM Agent",
+            msg: `${this.prospects.length} prospects tracked. ${this.prospects.filter(p => p.stage !== "New").length} are active.`
+          },
+          {
+            name: "Task Agent",
+            msg: `${this.tasks.filter(t => t.status !== "Done").length} open tasks waiting for action.`
+          },
+          {
+            name: "Signal Agent",
+            msg: `${this.signals.length} current signals can feed outreach.`
+          },
+          {
+            name: "Outreach Agent",
+            msg: `Ready to turn CRM + signals + market intel into email drafts.`
+          }
+        ];
+      },
+
+      addProspect(company, contact, stage, nextStep) {
+        this.prospects.push({ company, contact, stage, nextStep, notes: "" });
+        this.save();
+        refreshBrain();
+      },
+
+      addTask(task, owner) {
+        this.tasks.push({ task, owner, status: "Open" });
+        this.save();
+        refreshBrain();
+      },
+
+      addSignal(company, signal, action) {
+        this.signals.push({ company, signal, action });
+        this.save();
+        refreshBrain();
+      }
+    };
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById("liveClock").textContent = now.toLocaleString("en-US", {
+        weekday: "short",
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+    }
+
+    function bindMetric(inputId, valueId, storageKey) {
+      const input = document.getElementById(inputId);
+      const value = document.getElementById(valueId);
+      const saved = localStorage.getItem(storageKey);
+
+      if (saved !== null) {
+        input.value = saved;
+        value.textContent = saved;
+      }
+
+      input.addEventListener("input", function () {
+        value.textContent = input.value || "0";
+        localStorage.setItem(storageKey, input.value || "0");
+      });
+    }
+
+    function refreshBrain() {
+      const strip = document.getElementById("brainStrip");
+      strip.innerHTML = DailyWeaponBrain.agents().map(agent => `
+        <div class="agent-card">
+          <strong>${agent.name}</strong>
+          <div>${agent.msg}</div>
+        </div>
+      `).join("");
+    }
+
+    function openBrainSummary() {
+      openWorkspace("Daily Weapon Brain", "One brain coordinating CRM, tasks, outreach, signals, intel, comps, news, and models.", `
+        <div class="three-col">
+          <div class="mini-card"><h3>Prospects</h3><p>${DailyWeaponBrain.prospects.length} tracked in CRM.</p></div>
+          <div class="mini-card"><h3>Tasks</h3><p>${DailyWeaponBrain.tasks.filter(t => t.status !== "Done").length} open tasks.</p></div>
+          <div class="mini-card"><h3>Signals</h3><p>${DailyWeaponBrain.signals.length} signals available for outreach.</p></div>
+        </div>
+        <div class="mini-card" style="margin-top:14px;">
+          <h3>Agentic Mind</h3>
+          <p>The dashboard is the brain. Each app is a tool. The agents watch the same shared memory and suggest next actions.</p>
+        </div>
+      `);
+    }
+
+    function openApp(app) {
+      const screens = {
+        crm: {
+          title: "CRM",
+          sub: "Prospect memory, stages, notes, and next steps.",
+          body: renderCRM()
+        },
+        tasks: {
+          title: "Daily Tasks",
+          sub: "Daily execution list for the helper agents.",
+          body: renderTasks()
+        },
+        outreach: {
+          title: "Outreach",
+          sub: "Turns CRM + signal context into email copy.",
+          body: renderOutreach()
+        },
+        signals: {
+          title: "Signals",
+          sub: "Capture trigger events and route them to outreach.",
+          body: renderSignals()
+        },
+        market: {
+          title: "Market Intel",
+          sub: "Market notes that agents can use in emails and calls.",
+          body: renderMarketIntel()
+        },
+        news: {
+          title: "News",
+          sub: "News touch points that feed signals and outreach.",
+          body: renderNews()
+        },
+        comp: {
+          title: "Comp Data",
+          sub: "Comp request builder for lease/sale intel.",
+          body: renderCompData()
+        },
+        models: {
+          title: "Financial Models",
+          sub: "Model launcher and deal math command center.",
+          body: renderModels()
+        }
+      };
+
+      openWorkspace(screens[app].title, screens[app].sub, screens[app].body);
+    }
+
+    function openWorkspace(title, subhead, body) {
+      document.getElementById("workspaceTitle").textContent = title;
+      document.getElementById("workspaceSubhead").textContent = subhead;
+      document.getElementById("workspaceBody").innerHTML = body;
+      document.getElementById("workspacePanel").style.display = "block";
+      document.getElementById("workspacePanel").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function closeWorkspace() {
+      document.getElementById("workspacePanel").style.display = "none";
+    }
+
+    function renderCRM() {
+      return `
+        <div class="two-col">
+          <div class="mini-card">
+            <h3>Add Prospect</h3>
+            <input id="newCompany" placeholder="Company name" />
+            <input id="newContact" placeholder="Contact / role" />
+            <select id="newStage">
+              <option>New</option>
+              <option>Research</option>
+              <option>Contacted</option>
+              <option>Follow-up</option>
+              <option>Meeting</option>
+              <option>Deal</option>
+            </select>
+            <input id="newNextStep" placeholder="Next step" />
+            <button onclick="saveNewProspect()">Save to Brain</button>
+          </div>
+          <div class="mini-card">
+            <h3>CRM Memory</h3>
+            ${DailyWeaponBrain.prospects.map(p => `
+              <p><strong>${p.company}</strong><br>${p.contact || "No contact"} • ${p.stage}<br><span style="color:#93c5fd;">Next:</span> ${p.nextStep || "None"}</p>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTasks() {
+      return `
+        <div class="two-col">
+          <div class="mini-card">
+            <h3>Add Task</h3>
+            <input id="newTask" placeholder="Task" />
+            <select id="newOwner">
+              <option>CRM Agent</option>
+              <option>Task Agent</option>
+              <option>Outreach Agent</option>
+              <option>Signal Agent</option>
+              <option>Market Intel Agent</option>
+            </select>
+            <button onclick="saveNewTask()">Add Task</button>
+          </div>
+          <div class="mini-card">
+            <h3>Open Tasks</h3>
+            ${DailyWeaponBrain.tasks.map((t, i) => `
+              <p><strong>${t.task}</strong><br>${t.owner} • ${t.status} <button onclick="markTaskDone(${i})">Done</button></p>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderOutreach() {
+      const first = DailyWeaponBrain.prospects[0] || { company: "[Company]", contact: "there", nextStep: "" };
+      const signal = DailyWeaponBrain.signals.find(s => s.company === first.company) || DailyWeaponBrain.signals[0] || {};
+      return `
+        <div class="two-col">
+          <div class="mini-card">
+            <h3>Outreach Context</h3>
+            <select id="outreachProspect" onchange="rewriteOutreach()">
+              ${DailyWeaponBrain.prospects.map((p, i) => `<option value="${i}">${p.company}</option>`).join("")}
+            </select>
+            <button onclick="rewriteOutreach()">Generate Draft</button>
+            <button onclick="copyOutreach()">Copy Draft</button>
+          </div>
+          <div class="mini-card">
+            <h3>Email Draft</h3>
+            <textarea id="outreachDraft">${buildEmail(first, signal)}</textarea>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSignals() {
+      return `
+        <div class="two-col">
+          <div class="mini-card">
+            <h3>Add Signal</h3>
+            <input id="signalCompany" placeholder="Company" />
+            <input id="signalText" placeholder="Signal, e.g. expansion, lease, hiring, permit" />
+            <input id="signalAction" placeholder="Recommended action" />
+            <button onclick="saveNewSignal()">Save Signal</button>
+          </div>
+          <div class="mini-card">
+            <h3>Signal Feed</h3>
+            ${DailyWeaponBrain.signals.map(s => `
+              <p><strong>${s.company}</strong><br>${s.signal}<br><span style="color:#93c5fd;">Action:</span> ${s.action}</p>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMarketIntel() {
+      return `
+        <div class="mini-card">
+          <h3>Market Intel Agent</h3>
+          <p>Use this app for Tampa rent trends, vacancy, active requirements, landlord leverage, and broker talking points.</p>
+          <textarea id="marketNote" placeholder="Paste market note here..."></textarea>
+          <button onclick="saveBrainNote('Market Intel', document.getElementById('marketNote').value)">Save Market Note</button>
+        </div>
+      `;
+    }
+
+    function renderNews() {
+      return `
+        <div class="three-col">
+          <div class="mini-card"><h3>Tampa Bay Business Journal</h3><p>Open local business news for prospect triggers.</p><button onclick="window.open('https://www.bizjournals.com/tampabay/', '_blank')">Open</button></div>
+          <div class="mini-card"><h3>CRE News</h3><p>Use market news as a reason to call or email.</p><button onclick="window.open('https://www.globest.com/markets/southeast/', '_blank')">Open</button></div>
+          <div class="mini-card"><h3>Google News Search</h3><p>Search Tampa commercial real estate expansion signals.</p><button onclick="window.open('https://news.google.com/search?q=Tampa%20commercial%20real%20estate%20tenant%20expansion', '_blank')">Open</button></div>
+        </div>
+      `;
+    }
+
+    function renderCompData() {
+      return `
+        <div class="mini-card">
+          <h3>Comp Request Builder</h3>
+          <input id="compMarket" placeholder="Market / submarket" />
+          <input id="compSize" placeholder="Size range" />
+          <input id="compType" placeholder="Industrial, flex, office, retail, etc." />
+          <textarea id="compOutput" placeholder="Generated comp request will appear here..."></textarea>
+          <button onclick="buildCompRequest()">Build Request</button>
+          <button onclick="copyField('compOutput')">Copy</button>
+        </div>
+      `;
+    }
+
+    function renderModels() {
+      return `
+        <div class="three-col">
+          <div class="mini-card"><h3>Financial Model</h3><p>Open your workbook.</p><button onclick="window.open('Daily_Weapon_Financial_Model.xlsx', '_blank')">Open Model</button></div>
+          <div class="mini-card"><h3>Commission Tracker</h3><p>Tracks deal value and commission forecast.</p><button onclick="alert('Commission tracker comes next.')">Open</button></div>
+          <div class="mini-card"><h3>Lease Analysis</h3><p>Compare rent, term, TI, free rent, and occupancy cost.</p><button onclick="alert('Lease analysis comes next.')">Open</button></div>
+        </div>
+      `;
+    }
+
+    function saveNewProspect() {
+      DailyWeaponBrain.addProspect(
+        document.getElementById("newCompany").value || "Unnamed Company",
+        document.getElementById("newContact").value || "",
+        document.getElementById("newStage").value || "New",
+        document.getElementById("newNextStep").value || ""
+      );
+      openApp("crm");
+    }
+
+    function saveNewTask() {
+      DailyWeaponBrain.addTask(
+        document.getElementById("newTask").value || "Untitled task",
+        document.getElementById("newOwner").value || "Task Agent"
+      );
+      openApp("tasks");
+    }
+
+    function markTaskDone(index) {
+      DailyWeaponBrain.tasks[index].status = "Done";
+      DailyWeaponBrain.save();
+      refreshBrain();
+      openApp("tasks");
+    }
+
+    function saveNewSignal() {
+      DailyWeaponBrain.addSignal(
+        document.getElementById("signalCompany").value || "Unknown Company",
+        document.getElementById("signalText").value || "General signal",
+        document.getElementById("signalAction").value || "Review for outreach"
+      );
+      openApp("signals");
+    }
+
+    function buildEmail(prospect, signal) {
+      const contact = prospect.contact || "there";
+      const company = prospect.company || "[Company]";
+      const signalLine = signal && signal.signal ? `I noticed a signal around ${signal.signal.toLowerCase()}, and thought it may be worth connecting.` : "I wanted to introduce myself and see if real estate planning is on your radar.";
+
+      return `Subject: Quick question on ${company}
+
+Hi ${contact},
+
+${signalLine}
+
+I work in commercial real estate in Tampa and help companies evaluate lease options, renewals, relocations, expansions, and market opportunities.
+
+Are you the right person to speak with about real estate decisions for ${company}, or is there someone else on your team I should connect with?
+
+Best,
+Connor`;
+    }
+
+    function rewriteOutreach() {
+      const index = document.getElementById("outreachProspect").value;
+      const prospect = DailyWeaponBrain.prospects[index];
+      const signal = DailyWeaponBrain.signals.find(s => s.company === prospect.company) || DailyWeaponBrain.signals[0] || {};
+      document.getElementById("outreachDraft").value = buildEmail(prospect, signal);
+    }
+
+    function copyOutreach() {
+      navigator.clipboard.writeText(document.getElementById("outreachDraft").value);
+      alert("Draft copied.");
+    }
+
+    function saveBrainNote(type, text) {
+      if (!text.trim()) {
+        alert("Write a note first.");
+        return;
+      }
+
+      DailyWeaponBrain.notes.push({ type, text, created: new Date().toISOString() });
+      DailyWeaponBrain.save();
+      alert(type + " note saved to Brain.");
+    }
+
+    function buildCompRequest() {
+      const market = document.getElementById("compMarket").value || "[Market]";
+      const size = document.getElementById("compSize").value || "[Size range]";
+      const type = document.getElementById("compType").value || "[Asset type]";
+
+      document.getElementById("compOutput").value =
+`Can you please send relevant comps for:
+
+Market/Submarket: ${market}
+Size Range: ${size}
+Asset Type: ${type}
+
+Please include lease comps, sale comps if available, asking rents, achieved rents, date, tenant/buyer, landlord/seller, address, building size, clear height where applicable, and any notes on concessions or TI.`;
+    }
+
+    function copyField(id) {
+      navigator.clipboard.writeText(document.getElementById(id).value);
+      alert("Copied.");
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    bindMetric("dealsClosedInput", "dealsClosedValue", "dw_dealsClosed");
+    bindMetric("activeDealsInput", "activeDealsValue", "dw_activeDeals");
+    bindMetric("activePursuitsInput", "activePursuitsValue", "dw_activePursuits");
+    bindMetric("potentialClosingsInput", "potentialClosingsValue", "dw_potentialClosings");
+
+    DailyWeaponBrain.seed();
+    refreshBrain();
+  </script>
+</body>
+</html>

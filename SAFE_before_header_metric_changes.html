@@ -326,26 +326,6 @@
     @media(max-width:1100px){.owner-lookup-grid{grid-template-columns:1fr}.signal-app-grid{grid-template-columns:repeat(2,1fr)}.metrics,.brain-strip,.task-bucket-grid{grid-template-columns:repeat(2,1fr)}.apps-grid{grid-template-columns:repeat(4,1fr)}.topbar{align-items:flex-start;flex-direction:column}.two-col,.three-col{grid-template-columns:1fr}}@media(max-width:700px){.agent-mini-grid,.signal-app-grid{grid-template-columns:1fr}.shell{width:min(100% - 24px,1320px)}.metrics,.brain-strip,.task-bucket-grid{grid-template-columns:1fr}.apps-grid{grid-template-columns:repeat(2,1fr)}.queue-top{flex-direction:column}}
   
 </style>
-
-<style id="metric-cleanup-style">
-  .metric input,
-  .metric select,
-  .metric-card input,
-  .metric-card select {
-    display: none !important;
-  }
-
-  .metric,
-  .metric-card {
-    text-align: center !important;
-  }
-
-  .metric .value,
-  .metric-card .value {
-    text-align: center !important;
-  }
-</style>
-
 </head>
 <body>
 <main class="shell">
@@ -369,34 +349,34 @@
     </article>
 
     <article class="metric-card">
-      <div class="metric-label">SF Leased / Sold</div>
+      <div class="metric-label">SF Leased</div>
       <div class="metric-value" id="sfLeasedValue">0</div>
       <input id="sfLeasedInput" type="number" value="0" />
     </article>
 
     <article class="metric-card">
-      <div class="metric-label">Listings</div>
+      <div class="metric-label">SF Sold</div>
       <div class="metric-value" id="sfSoldValue">0</div>
       <input id="sfSoldInput" type="number" value="0" />
     </article>
   </section>
 
-  <div class="metric-section-title">Deal Tracker</div>
+  <div class="metric-section-title">Active 2026 Pipeline</div>
   <section class="metrics two-row">
     <article class="metric-card">
-      <div class="metric-label">Total Outreach</div>
-      <div class="metric-value" id="activeTotal OutreachValue">0</div>
+      <div class="metric-label">Pursuits</div>
+      <div class="metric-value" id="activePursuitsValue">0</div>
     </article>
 
     <article class="metric-card">
-      <div class="metric-label">Conversion Rate</div>
-      <div class="metric-value" id="activeTransactionsValue" data-live-transaction-card="true">0</div>
+      <div class="metric-label">Active Transactions</div>
+      <div class="metric-value" id="activeTransactionsValue">0</div>
       <input id="activeTransactionsInput" type="number" value="0" />
     </article>
 
     <article class="metric-card">
-      <div class="metric-label">Live Transactions</div>
-      <div class="metric-value" id="liveTransactionsValue">0</div>
+      <div class="metric-label">Active Listings</div>
+      <div class="metric-value" id="activeListingsValue">0</div>
       <input id="activeListingsInput" type="number" value="0" />
     </article>
 
@@ -669,129 +649,24 @@ function generateDailyCommandQueue(){
 
 function renderAgentBoard(){ return ``; }
 
-
 function refreshAll(){
+  const activePursuits = Brain.prospects.filter(p => p.stage !== "Deal").length;
+  if(document.getElementById("activePursuitsValue")) activePursuitsValue.textContent = activePursuits;
 
-  const totalOutreach = (Brain.completedOutreach || []).length;
+  if(document.getElementById("transactionsCompletedInput")) transactionsCompletedValue.textContent = transactionsCompletedInput.value || "0";
+  if(document.getElementById("totalRevenueInput")) totalRevenueValue.textContent = "$" + Number(totalRevenueInput.value || 0).toLocaleString();
+  if(document.getElementById("sfLeasedInput")) sfLeasedValue.textContent = Number(sfLeasedInput.value || 0).toLocaleString();
+  if(document.getElementById("sfSoldInput")) sfSoldValue.textContent = Number(sfSoldInput.value || 0).toLocaleString();
+  if(document.getElementById("activeTransactionsInput")) activeTransactionsValue.textContent = activeTransactionsInput.value || "0";
+  if(document.getElementById("activeListingsInput")) activeListingsValue.textContent = activeListingsInput.value || "0";
+  if(document.getElementById("potentialClosingsInput")) potentialClosingsValue.textContent = potentialClosingsInput.value || "0";
 
-  const prospectResponses = (Brain.completedOutreach || []).filter(x => {
-    const txt = String(
-      (x.outcome || "") + " " +
-      (x.completedNote || "") + " " +
-      (x.responseStatus || "")
-    ).toLowerCase();
+  const m = outreachMetrics();
 
-    return txt.includes("response")
-      || txt.includes("responded")
-      || txt.includes("reply")
-      || txt.includes("replied");
-  }).length;
-
-  const conversionRate = totalOutreach
-    ? ((prospectResponses / totalOutreach) * 100).toFixed(1)
-    : "0.0";
-
-  if(document.getElementById("activePursuitsValue")){
-    activePursuitsValue.textContent = totalOutreach;
-  }
-
-  if(document.getElementById("transactionsCompletedInput")){
-    transactionsCompletedValue.textContent =
-      transactionsCompletedInput.value || "0";
-  }
-
-  if(document.getElementById("totalRevenueInput")){
-    totalRevenueValue.textContent =
-      "$" + Number(totalRevenueInput.value || 0).toLocaleString();
-  }
-
-  if(document.getElementById("sfLeasedInput")){
-    sfLeasedValue.textContent =
-      Number(sfLeasedInput.value || 0).toLocaleString();
-  }
-
-  if(document.getElementById("sfSoldInput")){
-    sfSoldValue.textContent =
-      Number(sfSoldInput.value || 0).toLocaleString();
-  }
-
-  if(document.getElementById("activeTransactionsValue")){
-    activeTransactionsValue.innerHTML = `
-  <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-top:8px;">
-
-    <div style="text-align:center;min-width:90px;">
-      <div style="font-size:11px;color:#cbd5e1;letter-spacing:1px;font-weight:800;">
-        RESPONSE #
-      </div>
-
-      <div style="font-size:34px;font-weight:950;line-height:1.1;margin-top:8px;">
-        ${prospectResponses}
-      </div>
-    </div>
-
-    <div style="width:1px;height:54px;background:rgba(255,255,255,.22);"></div>
-
-    <div style="text-align:center;min-width:100px;">
-      <div style="font-size:11px;color:#cbd5e1;letter-spacing:1px;font-weight:800;">
-        CONVERSION %
-      </div>
-
-      <div style="font-size:34px;font-weight:950;line-height:1.1;margin-top:8px;">
-        ${conversionRate}%
-      </div>
-    </div>
-
-  </div>
-`;
-  }
-
-  // LIVE CRM METRICS
-  const listingsCount = Brain.prospects.filter(p =>
-    String(p.sourceTab || "").toLowerCase().includes("listing")
-  ).length;
-
-  const liveTransactions = Brain.prospects.filter(p =>
-    String(p.sourceTab || "").toLowerCase().includes("live transaction")
-  );
-
-  const liveTransactionCount = liveTransactions.length;
-
-  const closings2026 = liveTransactions.filter(p => {
-    const txt = String(
-      p.expectedClosingDate ||
-      p["Expected Closing Date"] ||
-      p.notes ||
-      ""
-    );
-
-    return txt.includes("2026");
-  }).length;
-
-  if(document.getElementById("activeListingsValue")){
-    activeListingsValue.textContent = listingsCount;
-  }
-
-  if(document.getElementById("liveTransactionsValue")){
-    liveTransactionsValue.textContent = liveTransactionCount;
-  }
-
-  const liveTransactionMetric =
-    document.querySelector('[data-live-transaction-card="true"]');
-
-  if(liveTransactionMetric){
-    liveTransactionMetric.setAttribute(
-      "data-live-count",
-      liveTransactionCount
-    );
-  }
-
-  if(document.getElementById("potentialClosingsValue")){
-    potentialClosingsValue.textContent = closings2026;
-  }
-
-  if(document.getElementById("sfSoldValue")){
-    sfSoldValue.textContent = listingsCount;
-  }
+  if(document.getElementById("outreachSentValue")) outreachSentValue.textContent = m.sent;
+  if(document.getElementById("responsesValue")) responsesValue.textContent = m.responses;
+  if(document.getElementById("meetingsValue")) meetingsValue.textContent = m.meetings;
+  if(document.getElementById("closedDealsTrackedValue")) closedDealsTrackedValue.textContent = m.closedDeals;
 
   Brain.prospects.forEach(p => {
     p.autoTags = autoStrategyTags(p);
@@ -799,7 +674,6 @@ function refreshAll(){
 
   brainStrip.innerHTML = renderAgentBoard();
 }
-
 
 function openWorkspace(title, subhead, body){
   workspaceTitle.textContent = title;
@@ -3531,8 +3405,8 @@ function mapHotProspectRows(rows){
 function mapActiveDealRows(rows){
   return (rows || []).map(row => {
     const p = prospectBase({
-      sourceTab:"Live Transactions",
-      agenda:"Live Transactions",
+      sourceTab:"Active Deals",
+      agenda:"Active Deals",
       row,
       company:getRowValue(row,["Company"]),
       property:getRowValue(row,["Address"]),
@@ -3596,7 +3470,7 @@ function syncClosedDealsMetricsFromRows(rows){
 
   const sample = rows.find(r => Object.values(r).some(v => String(v || "").trim())) || rows[0];
   const revenueKey = findMetricKey(sample, ["Total Revenue", "Revenue", "Commission", "Commission Revenue", "Gross Commission", "Fee", "Amount"]);
-  const sfLeasedKey = findMetricKey(sample, ["SF Leased / Sold", "Leased SF", "Square Feet Leased", "Sq Ft Leased", "SF", "Square Feet"]);
+  const sfLeasedKey = findMetricKey(sample, ["SF Leased", "Leased SF", "Square Feet Leased", "Sq Ft Leased", "SF", "Square Feet"]);
   const typeKey = findMetricKey(sample, ["Type", "Transaction Type", "Deal Type"]);
 
   let transactionsCompleted = 0;
