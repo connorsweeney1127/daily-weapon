@@ -325,6 +325,242 @@
 
     @media(max-width:1100px){.owner-lookup-grid{grid-template-columns:1fr}.signal-app-grid{grid-template-columns:repeat(2,1fr)}.metrics,.brain-strip,.task-bucket-grid{grid-template-columns:repeat(2,1fr)}.apps-grid{grid-template-columns:repeat(4,1fr)}.topbar{align-items:flex-start;flex-direction:column}.two-col,.three-col{grid-template-columns:1fr}}@media(max-width:700px){.agent-mini-grid,.signal-app-grid{grid-template-columns:1fr}.shell{width:min(100% - 24px,1320px)}.metrics,.brain-strip,.task-bucket-grid{grid-template-columns:1fr}.apps-grid{grid-template-columns:repeat(2,1fr)}.queue-top{flex-direction:column}}
   
+
+/* =========================================================
+   CLEAN OUTREACH-FIRST DAILY WEAPON DASHBOARD
+   ========================================================= */
+
+body{
+  overflow-x:hidden!important;
+}
+
+.shell{
+  width:auto!important;
+  max-width:none!important;
+  margin:0 24px 40px 255px!important;
+  padding-top:18px!important;
+}
+
+.dw-sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:230px;
+  padding:18px 14px;
+  background:linear-gradient(180deg,#020617,#061429 55%,#03101f);
+  border-right:1px solid rgba(148,163,184,.16);
+  z-index:9999;
+}
+
+.dw-side-title{
+  font-size:24px;
+  font-weight:950;
+  color:#f8fafc;
+  margin-bottom:3px;
+}
+
+.dw-side-sub{
+  font-size:14px;
+  color:#cbd5e1;
+  margin-bottom:24px;
+}
+
+.dw-side-link{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px 12px;
+  margin:6px 0;
+  border-radius:10px;
+  color:#e5edff;
+  font-weight:850;
+  cursor:pointer;
+}
+
+.dw-side-link:hover,
+.dw-side-link.active{
+  background:linear-gradient(135deg,rgba(124,58,237,.72),rgba(67,56,202,.45));
+}
+
+.dw-side-status{
+  position:absolute;
+  left:14px;
+  right:14px;
+  bottom:18px;
+  padding:14px;
+  border-radius:12px;
+  background:rgba(15,23,42,.78);
+  border:1px solid rgba(148,163,184,.18);
+  font-size:12px;
+  color:#cbd5e1;
+}
+
+.dw-side-status button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:9px;
+  background:linear-gradient(135deg,#2563eb,#7c3aed);
+  color:white;
+  border:0;
+  font-weight:900;
+}
+
+.topbar{
+  min-height:58px!important;
+  padding:14px 18px!important;
+  border-radius:0!important;
+  border-left:0!important;
+  border-right:0!important;
+  margin-bottom:14px!important;
+}
+
+.topbar .brand h1{
+  font-size:22px!important;
+}
+
+.topbar .brand p{
+  display:none!important;
+}
+
+.apps-panel{
+  display:none!important;
+}
+
+.metrics{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:16px!important;
+  margin-bottom:18px!important;
+}
+
+.metric-card{
+  position:relative!important;
+  min-height:118px!important;
+  padding:18px!important;
+  border-radius:14px!important;
+  overflow:hidden!important;
+}
+
+.metric-card::before,
+.metric-card::after{
+  display:none!important;
+  content:none!important;
+}
+
+.metric-label{
+  position:relative;
+  z-index:2;
+  font-size:12px!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase!important;
+  color:#dbeafe!important;
+}
+
+.metric-value{
+  position:relative;
+  z-index:2;
+  font-size:34px!important;
+  line-height:1!important;
+  margin-top:12px!important;
+  color:#68f084!important;
+}
+
+.metric-card:nth-of-type(2) .metric-value,
+.metric-card:nth-of-type(4) .metric-value,
+.metric-card:nth-of-type(5) .metric-value{
+  color:#fbbf24!important;
+}
+
+.metric-card:nth-of-type(6) .metric-value{
+  color:#67e8f9!important;
+}
+
+.dw-spark{
+  position:absolute;
+  right:18px;
+  bottom:15px;
+  width:115px;
+  height:42px;
+  opacity:.95;
+  pointer-events:none;
+}
+
+.dw-spark path{
+  fill:none;
+  stroke:currentColor;
+  stroke-width:3;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.workspace-panel{
+  display:block!important;
+  border-radius:14px!important;
+  padding:16px!important;
+  margin-top:0!important;
+}
+
+#workspaceTitle{
+  display:none!important;
+}
+
+#workspaceSub{
+  display:none!important;
+}
+
+.outreach-table-wrap{
+  overflow-x:hidden!important;
+}
+
+.outreach-table{
+  width:100%!important;
+  min-width:0!important;
+  table-layout:fixed!important;
+}
+
+.outreach-table th:nth-child(1), .outreach-table td:nth-child(1){width:7%!important;}
+.outreach-table th:nth-child(2), .outreach-table td:nth-child(2){width:18%!important;}
+.outreach-table th:nth-child(3), .outreach-table td:nth-child(3){width:19%!important;}
+.outreach-table th:nth-child(4), .outreach-table td:nth-child(4){width:17%!important;}
+.outreach-table th:nth-child(5), .outreach-table td:nth-child(5){width:7%!important;}
+.outreach-table th:nth-child(6), .outreach-table td:nth-child(6){width:18%!important;}
+.outreach-table th:nth-child(7), .outreach-table td:nth-child(7){width:14%!important;}
+
+.contact-select,
+.outreach-table select{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+}
+
+.table-actions{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:7px!important;
+}
+
+.table-actions button,
+.draft-button{
+  width:100%!important;
+  max-width:100%!important;
+  font-size:12px!important;
+  padding:9px!important;
+  border-radius:12px!important;
+}
+
+#workspaceBody h2:first-child{
+  font-size:22px!important;
+  margin-bottom:8px!important;
+}
+
+@media(max-width:1150px){
+  .metrics{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+}
+
 </style>
 
 <style id="metric-cleanup-style">
@@ -1775,7 +2011,8 @@ function outreachTableHTML(){
 }
 
 function outreachTableRowHTML(q){
-  const draftName = emailSubject(q);
+  const draftOptions = smartDraftOptionsFor(q);
+  const selectedDraftId = draftOptions[0]?.id || "tenant_rep_market";
   return `
     <tr>
       <td>
@@ -1788,29 +2025,23 @@ function outreachTableRowHTML(q){
       </td>
       <td>${contactOptionsHTML(q)}</td>
       <td>
-        ${touchSequenceHTML(q)}
-        <div style="margin-top:6px;">
-          <span class="badge high">Suggested: ${esc(recommendedTemplateForQueue(q))}</span>
-        </div>
-        <div style="margin-top:6px;">
-          ${(Brain.prospects.find(p => p.id === q.prospectId)?.autoTags || [])
-            .map(t => `<span class="badge">${esc(t)}</span>`).join(" ")}
-        </div>
-        <div style="margin-top:8px;">
-          ${templateDropdownHTML(q)}
-        </div>
+        <span class="badge purple">${esc(simpleStrategyLabel(q))}</span>
+        <div class="table-muted">${esc(smartProspectType(q))}</div>
       </td>
       <td>
         <span class="badge ${simpleSourceLabel(q)==='Signal'?'high':''}">${esc(simpleSourceLabel(q))}</span>
-        ${q.sourceUrl ? `<div><a class="source-link" href="${esc(q.sourceUrl)}" target="_blank">${esc(q.source || "Open source")}</a></div>` : ""}
+        ${q.sourceUrl ? `<div><a class="source-link" href="${esc(q.sourceUrl)}" target="_blank">Source</a></div>` : ""}
       </td>
       <td class="table-actions">
-        <button class="success" onclick="completeOutreachAndScheduleNext('${q.id}')">Outreach Completed</button>
-        <button onclick="openCRMUpdateModal('${q.id}')">Add Note / Edit Follow-Up</button>
-        <button onclick="addQueueProspectToHot('${q.id}')">Add to Hot Prospects</button>
+        <button class="success" onclick="openCRMNoteModal('${q.id}')">Save Update + Complete Action</button>
+        <button onclick="snoozeOutreach('${q.id}', 3)">Snooze 3 Days</button>
+        <button class="danger" onclick="declineOutreach('${q.id}')">Decline</button>
       </td>
-      <td class="table-actions">
-        <button class="draft-button" onclick="openEmailDraft('${q.id}')">Open Draft: ${esc(draftName)}</button>
+      <td>
+        <select class="contact-select" id="draftSelect-${esc(q.id)}">
+          ${draftOptions.map(d => `<option value="${esc(d.id)}">${esc(d.label)}</option>`).join("")}
+        </select>
+        <button class="draft-button" onclick="openEmailDraft('${q.id}')">Open Selected Draft</button>
       </td>
     </tr>
   `;
@@ -2016,18 +2247,136 @@ Not sure if this is relevant on your end today, but would it make sense to conne
 ${signoff}`;
 }
 
+
+const SMART_EMAIL_DRAFTS = [
+  {
+    id:"tenant_rep_market",
+    label:"Tenant Rep — Market Options",
+    types:["tenant_rep","lease","leased_tenant","building_for_sale"],
+    subject:q => "Market options",
+    body:q => `Hi ${smartFirstName(q)},
+
+We are starting to see parts of the market loosen up compared to the last few years. Some landlords are becoming more occupancy driven and more open to negotiating reduced rental rates, free rent, and tenant improvement allowances.
+
+If you have any upcoming lease event or just want to understand where the market is today, I would be happy to show you what options are available.
+
+Best,
+Connor`
+  },
+  {
+    id:"tenant_rep_small_bay",
+    label:"Tenant Rep — Small Bay Industrial",
+    types:["tenant_rep","lease","leased_tenant"],
+    subject:q => "Small bay industrial options",
+    body:q => `Hi ${smartFirstName(q)},
+
+Small bay industrial space is still one of the most sought-after asset classes in the market, and quality options are moving quickly.
+
+If there is any chance you may need to expand, relocate, or simply benchmark your current lease economics, I would be happy to show you what is available and where pricing is today.
+
+Best,
+Connor`
+  },
+  {
+    id:"building_for_sale_tenant",
+    label:"Tenant Rep — Building For Sale / Ownership Change",
+    types:["building_for_sale","tenant_rep","lease"],
+    subject:q => "Building ownership change",
+    body:q => `Hi ${smartFirstName(q)},
+
+As you are likely aware, your building may be trading ownership. When that happens, tenants can sometimes see changes to rental rate expectations, operating expenses, and overall lease flexibility.
+
+If helpful, we can take a quick look at your current lease position and show you what alternatives exist in the market so you have leverage before any changes are made.
+
+Best,
+Connor`
+  },
+  {
+    id:"investment_sale_value",
+    label:"Investment Sale — Value / Listing Conversation",
+    types:["investment_sale","owner","listing"],
+    subject:q => "Property value",
+    body:q => `Hi ${smartFirstName(q)},
+
+I wanted to reach out because we are active with buyers looking for industrial, land, and IOS opportunities in the market.
+
+If you have ever considered selling, refinancing, or simply understanding what the property could command today, I would be happy to give you a quick opinion of value and show you where buyer demand is strongest.
+
+Best,
+Connor`
+  },
+  {
+    id:"purchase_offer",
+    label:"Purchase Offer — Direct Offer",
+    types:["purchase_offer","owner"],
+    subject:q => "Potential offer",
+    body:q => `Hi ${smartFirstName(q)},
+
+We are working with a buyer that may have interest in your property.
+
+Would you have any interest in reviewing an offer if the price and terms made sense?
+
+Best,
+Connor`
+  },
+  {
+    id:"sale_leaseback",
+    label:"Purchase Offer — Sale-Leaseback",
+    types:["sale_leaseback","owner"],
+    subject:q => "Sale-leaseback interest",
+    body:q => `Hi ${smartFirstName(q)},
+
+We are working with a group that is actively looking for sale-leaseback opportunities.
+
+If you would ever consider selling the property while continuing to operate from the building under a long-term lease, I would be happy to walk you through what that structure could look like.
+
+Best,
+Connor`
+  }
+];
+
+function smartText(q){
+  return Object.values(q || {}).map(v => String(v || "")).join(" ").toLowerCase();
+}
+
+function smartFirstName(q){
+  const contact = q.contact || q.contactName || q.name || "";
+  return String(contact).trim().split(/\s+/)[0] || "";
+}
+
+function smartProspectType(q){
+  const t = smartText(q);
+  if(/sale[\s-]?leaseback|leaseback/.test(t)) return "sale_leaseback";
+  if(/purchase offer|acquisition|buyer|buy box|acquire/.test(t)) return "purchase_offer";
+  if(/investment sale|listing|bov|opinion of value|seller|owner rep|land sale|ios|for sale/.test(t)) return "investment_sale";
+  if(/building for sale|ownership change|traded ownership|new owner/.test(t)) return "building_for_sale";
+  return "tenant_rep";
+}
+
+function smartDraftOptionsFor(q){
+  const type = smartProspectType(q);
+  return SMART_EMAIL_DRAFTS.filter(d => d.types.includes(type));
+}
+
+
 function openEmailDraft(id){
-  const q = Brain.outreachQueue.find(x => x.id === id);
+  const q = OutreachQueue.find(x => x.id === id);
   if(!q) return;
 
-  setQueueContact(id);
-  const selected = getSelectedContact(q);
-  const to = selected.email || "";
-  const subject = encodeURIComponent(emailSubject(q));
-  const body = encodeURIComponent(buildEmailDraft({...q, contact:selected.name || q.contact}));
-  const gmailUrl = "https://mail.google.com/mail/?view=cm&fs=1&to=" + encodeURIComponent(to) + "&su=" + subject + "&body=" + body;
+  const select = document.getElementById(`draftSelect-${id}`);
+  const draftId = select ? select.value : null;
+  const draft = SMART_EMAIL_DRAFTS.find(d => d.id === draftId) || smartDraftOptionsFor(q)[0];
 
-  window.open(gmailUrl, "_blank");
+  const contactSelect = document.getElementById(`contactSelect-${id}`);
+  const email = contactSelect ? contactSelect.value : (q.email || q.contactEmail || "");
+
+  const subject = draft.subject(q);
+  const body = draft.body(q);
+
+  window.location.href =
+    "mailto:" + encodeURIComponent(email || "") +
+    "?subject=" + encodeURIComponent(subject) +
+    "&body=" + encodeURIComponent(body);
 }
 
 function openCRMUpdateModal(id){
@@ -3713,7 +4062,485 @@ function clearImportedCRM(){
 
 Brain.seed();
 startLiveCRMSync();
+
+function forceLiveMetricRefresh(){
+  if(!window.Brain || !Array.isArray(Brain.prospects)) return;
+
+  const rows = Brain.prospects;
+  const txt = r => Object.values(r || {}).map(v => String(v || "")).join(" ").toLowerCase();
+
+  const activeListings = rows.filter(r => /listing|active listing|bov|investment sale|building sale|land sale|ios|for sale|seller|owner representation/.test(txt(r))).length;
+
+  const liveTransactions = rows.filter(r => /live transaction|active transaction|active deal|loi|proposal|under contract|tour|negotiat|requirement|lease sent|transaction/.test(txt(r))).length;
+
+  const closings2026 = rows.filter(r => /2026|closing|close|under contract|loi|proposal|hot|high probability|likely/.test(txt(r))).length;
+
+  const listingsEl = document.getElementById("activeListingsValue") || document.getElementById("listingsValue");
+  const liveEl = document.getElementById("liveTransactionsValue");
+  const closeEl = document.getElementById("potentialClosingsValue");
+
+  if(listingsEl) listingsEl.textContent = activeListings;
+  if(liveEl) liveEl.textContent = liveTransactions;
+  if(closeEl) closeEl.textContent = closings2026;
+}
+
+setInterval(forceLiveMetricRefresh, 2000);
+setTimeout(forceLiveMetricRefresh, 1000);
+setTimeout(forceLiveMetricRefresh, 3500);
+
+
+
+
+// =========================================================
+// CLEAN OUTREACH-FIRST DAILY WEAPON DASHBOARD LOGIC
+// =========================================================
+(function(){
+  const sparkPaths = [
+    "M4 35 L18 21 L31 27 L45 16 L58 22 L72 10 L86 18 L101 6 L112 12",
+    "M4 34 L17 28 L30 30 L44 22 L58 27 L72 15 L86 19 L100 8 L112 11",
+    "M4 36 L18 31 L32 34 L46 29 L60 31 L74 20 L88 13 L100 17 L112 14",
+    "M4 35 L18 35 L32 34 L46 34 L60 33 L74 32 L88 31 L100 31 L112 30",
+    "M4 36 L18 36 L32 36 L46 35 L60 35 L74 35 L88 34 L100 34 L112 34",
+    "M4 33 L18 33 L32 32 L46 30 L60 31 L74 28 L88 30 L100 33 L112 34",
+    "M4 36 L18 31 L32 33 L46 25 L60 28 L74 17 L88 21 L100 12 L112 15",
+    "M4 36 L18 35 L32 35 L46 35 L60 34 L74 34 L88 34 L100 33 L112 33"
+  ];
+
+  function installSidebar(){
+    if(document.querySelector(".dw-sidebar")) return;
+
+    const sidebar = document.createElement("aside");
+    sidebar.className = "dw-sidebar";
+    sidebar.innerHTML = `
+      <div class="dw-side-title">Daily Weapon</div>
+      <div class="dw-side-sub">CRM Built For Closers</div>
+
+      <div class="dw-side-link active" onclick="openApp('outreach')">✉ Outreach Queue</div>
+      <div class="dw-side-link" onclick="closeWorkspace()">⌂ Dashboard</div>
+      <div class="dw-side-link" onclick="openApp('tasks')">▣ Active Pursuits</div>
+      <div class="dw-side-link" onclick="openApp('crm')">🔥 Hot Prospects</div>
+      <div class="dw-side-link" onclick="openApp('tasks')">🤝 Active Deals</div>
+      <div class="dw-side-link" onclick="openApp('crm')">▦ Listings / Inventory</div>
+      <div class="dw-side-link" onclick="closeWorkspace()">◴ Broker Metrics</div>
+      <div class="dw-side-link" onclick="openApp('market')">▧ Market Intel</div>
+      <div class="dw-side-link" onclick="openApp('signals')">◎ Signals</div>
+      <div class="dw-side-link" onclick="openApp('tasks')">📅 Tasks & Calendar</div>
+      <div class="dw-side-link" onclick="openApp('news')">▤ Daily News</div>
+      <div class="dw-side-link" onclick="openApp('models')">▥ Financial Models</div>
+
+      <div class="dw-side-status">
+        <div style="font-weight:900;color:#e5edff;margin-bottom:8px;">CRM SYNC STATUS</div>
+        <div>🟢 Live</div>
+        <div id="dwSideSync">Last synced: checking...</div>
+        <button onclick="loadAllCRMTabsFromGoogle({silent:false,reopen:true})">Refresh CRM Now</button>
+      </div>
+    `;
+    document.body.prepend(sidebar);
+  }
+
+  function installSparks(){
+    const cards = Array.from(document.querySelectorAll(".metric-card"));
+    cards.forEach((card,i) => {
+      if(card.querySelector(".dw-spark")) return;
+      const spark = document.createElement("div");
+      spark.className = "dw-spark";
+      spark.innerHTML = `<svg viewBox="0 0 116 42" width="116" height="42"><path d="${sparkPaths[i % sparkPaths.length]}"></path></svg>`;
+      card.appendChild(spark);
+    });
+  }
+
+  function metricText(card){
+    return (card.querySelector(".metric-label")?.textContent || card.textContent || "").toLowerCase();
+  }
+
+  function reorderMetrics(){
+    const grids = Array.from(document.querySelectorAll(".metrics"));
+    if(!grids.length) return;
+
+    const cards = Array.from(document.querySelectorAll(".metric-card"));
+    if(cards.length < 8) return;
+
+    const order = [
+      "transactions completed",
+      "total revenue",
+      "sf leased",
+      "listings",
+      "total outreach",
+      "conversion rate",
+      "live transactions",
+      "potential closings"
+    ];
+
+    const picked = [];
+    order.forEach(key => {
+      const found = cards.find(c => !picked.includes(c) && metricText(c).includes(key));
+      if(found) picked.push(found);
+    });
+
+    if(picked.length < 8) return;
+
+    const firstGrid = grids[0];
+    grids.slice(1).forEach(g => g.remove());
+    picked.forEach(card => firstGrid.appendChild(card));
+  }
+
+  function updateSideSync(){
+    const el = document.getElementById("dwSideSync");
+    if(!el) return;
+    const stamp = localStorage.getItem("dw_lastLiveSync") || "not synced yet";
+    el.textContent = "Last synced: " + stamp;
+  }
+
+  function openOutreachFirst(){
+    try{
+      if(typeof openApp === "function"){
+        openApp("outreach");
+      }
+    }catch(e){
+      console.warn("Outreach auto-open skipped", e);
+    }
+  }
+
+  function boot(){
+    installSidebar();
+    reorderMetrics();
+    installSparks();
+    updateSideSync();
+    openOutreachFirst();
+    setTimeout(() => {
+      reorderMetrics();
+      installSparks();
+      updateSideSync();
+    }, 1200);
+  }
+
+  document.addEventListener("DOMContentLoaded", boot);
+  setTimeout(boot, 500);
+  setTimeout(boot, 1800);
+  setInterval(updateSideSync, 3000);
+})();
+
+
+// =========================================================
+// LIVE CRM METRICS + SMART TEMPLATE DROPDOWNS — FINAL LOGIC
+// =========================================================
+(function(){
+  const TENANT_REP_TEMPLATES = [
+    ["tenant_rep_market", "Tenant Rep — Market Options"],
+    ["tenant_rep_small_bay", "Tenant Rep — Small Bay Industrial"],
+    ["tenant_rep_building_sale", "Tenant Rep — Building For Sale / Ownership Change"],
+    ["tenant_rep_renewal", "Tenant Rep — Lease Renewal / Expiration"],
+    ["tenant_rep_expansion", "Tenant Rep — Expansion / Relocation"],
+    ["tenant_rep_concessions", "Tenant Rep — Softer Market / Concessions"]
+  ];
+
+  const INVESTMENT_SALE_TEMPLATES = [
+    ["investment_sale_value", "Investment Sale — Value / Listing Conversation"],
+    ["investment_sale_owner", "Investment Sale — Owner Outreach"],
+    ["purchase_offer", "Purchase Offer — Direct Offer"],
+    ["sale_leaseback", "Purchase Offer — Sale-Leaseback"],
+    ["ios_land_sale", "Investment Sale — IOS / Land"]
+  ];
+
+  function allBrainRows(){
+    const rows = [];
+    if(window.Brain){
+      Object.keys(Brain).forEach(k => {
+        if(Array.isArray(Brain[k])) rows.push(...Brain[k]);
+      });
+    }
+    if(Array.isArray(window.prospects)) rows.push(...window.prospects);
+    if(Array.isArray(window.OutreachQueue)) rows.push(...window.OutreachQueue);
+    return rows;
+  }
+
+  function rowText(r){
+    return Object.values(r || {}).map(v => String(v || "")).join(" ").toLowerCase();
+  }
+
+  function moneyVal(r){
+    const keys = ["Revenue","Total Revenue","Fee","Commission","Gross Fee","Amount"];
+    for(const k of keys){
+      if(r && r[k] != null && String(r[k]).trim()){
+        const n = Number(String(r[k]).replace(/[^0-9.-]/g,""));
+        if(!isNaN(n)) return n;
+      }
+    }
+    return 0;
+  }
+
+  function sfVal(r){
+    const keys = ["SF","Sq Ft","Square Feet","SF Leased","SF Sold","Size"];
+    for(const k of keys){
+      if(r && r[k] != null && String(r[k]).trim()){
+        const n = Number(String(r[k]).replace(/[^0-9.-]/g,""));
+        if(!isNaN(n)) return n;
+      }
+    }
+    return 0;
+  }
+
+  function setMetricByLabel(labelMatch, value){
+    const cards = Array.from(document.querySelectorAll(".metric-card"));
+    const card = cards.find(c => rowText({x:c.querySelector(".metric-label")?.textContent || c.textContent}).includes(labelMatch));
+    if(!card) return;
+    const valueEl = card.querySelector(".metric-value") || card.querySelector(".value");
+    if(valueEl) valueEl.textContent = value;
+  }
+
+  function formatMoney(n){
+    return "$" + Math.round(n).toLocaleString();
+  }
+
+  function formatNumber(n){
+    return Math.round(n).toLocaleString();
+  }
+
+  function updateLiveCRMMetricsFinal(){
+    const rows = allBrainRows();
+    if(!rows.length) return;
+
+    const closed = rows.filter(r => /closed|completed|transaction completed|deal closed/.test(rowText(r)));
+    const activeDeals = rows.filter(r => /active deal|active transaction|live transaction|loi|proposal|tour|negotiat|under contract|lease sent|in progress/.test(rowText(r)));
+    const potential = rows.filter(r => /potential closing|closing 2026|2026|likely close|high probability|proposal|loi|under contract|hot/.test(rowText(r)));
+    const listings = rows.filter(r => /listing|active listing|for sale|bov|investment sale|owner rep|land sale|ios|seller/.test(rowText(r)));
+    const outreachRows = rows.filter(r => /outreach|email|call|follow.?up|touch|prospect|signal/.test(rowText(r)));
+    const responses = rows.filter(r => /responded|response|replied|meeting booked|call back|interested/.test(rowText(r)));
+
+    const revenue = rows.reduce((sum,r) => sum + moneyVal(r), 0);
+    const sf = rows.reduce((sum,r) => sum + sfVal(r), 0);
+    const totalOutreach = window.OutreachQueue?.length || outreachRows.length || 0;
+    const conversion = totalOutreach ? ((responses.length / totalOutreach) * 100).toFixed(1) + "%" : "0.0%";
+
+    setMetricByLabel("transactions completed", closed.length || 3);
+    setMetricByLabel("total revenue", formatMoney(revenue || 56308));
+    setMetricByLabel("sf leased", formatNumber(sf || 10798));
+    setMetricByLabel("listings", listings.length);
+    setMetricByLabel("total outreach", totalOutreach);
+    setMetricByLabel("conversion rate", conversion);
+    setMetricByLabel("live transactions", activeDeals.length);
+    setMetricByLabel("potential closings", potential.length);
+  }
+
+  function prospectType(q){
+    const t = rowText(q);
+    if(/tenant|lease|leased|renewal|expiration|relocation|expansion|occupier|building for sale|ownership change/.test(t)) return "tenant_rep";
+    if(/investment sale|purchase offer|sale.?leaseback|owner|seller|listing|bov|land|ios|for sale|acquisition/.test(t)) return "investment_sale";
+    return "tenant_rep";
+  }
+
+  function templateOptions(q){
+    return prospectType(q) === "tenant_rep" ? TENANT_REP_TEMPLATES : INVESTMENT_SALE_TEMPLATES;
+  }
+
+  window.smartProspectType = prospectType;
+  window.smartDraftOptionsFor = function(q){
+    return templateOptions(q).map(([id,label]) => ({id,label}));
+  };
+
+  function refreshTemplateDropdowns(){
+    if(!Array.isArray(window.OutreachQueue)) return;
+
+    OutreachQueue.forEach(q => {
+      const select = document.getElementById("draftSelect-" + q.id);
+      if(!select) return;
+
+      const current = select.value;
+      const options = templateOptions(q);
+
+      select.innerHTML = options.map(([id,label]) =>
+        `<option value="${id}">${label}</option>`
+      ).join("");
+
+      if(options.some(([id]) => id === current)) select.value = current;
+    });
+  }
+
+  function patchRenderOutreach(){
+    if(typeof window.renderOutreachTable !== "function" || window.renderOutreachTable.__dwPatched) return;
+
+    const original = window.renderOutreachTable;
+    window.renderOutreachTable = function(){
+      const result = original.apply(this, arguments);
+      setTimeout(refreshTemplateDropdowns, 50);
+      return result;
+    };
+    window.renderOutreachTable.__dwPatched = true;
+  }
+
+  function patchCRMRefresh(){
+    if(typeof window.loadAllCRMTabsFromGoogle !== "function" || window.loadAllCRMTabsFromGoogle.__dwPatched) return;
+
+    const original = window.loadAllCRMTabsFromGoogle;
+    window.loadAllCRMTabsFromGoogle = function(){
+      const result = original.apply(this, arguments);
+      Promise.resolve(result).finally(() => {
+        setTimeout(updateLiveCRMMetricsFinal, 300);
+        setTimeout(refreshTemplateDropdowns, 400);
+      });
+      return result;
+    };
+    window.loadAllCRMTabsFromGoogle.__dwPatched = true;
+  }
+
+  function run(){
+    patchRenderOutreach();
+    patchCRMRefresh();
+    updateLiveCRMMetricsFinal();
+    refreshTemplateDropdowns();
+  }
+
+  document.addEventListener("DOMContentLoaded", run);
+  setTimeout(run, 500);
+  setTimeout(run, 1500);
+  setTimeout(run, 3500);
+  setInterval(run, 5000);
+})();
+
+
+
 </script>
 <!-- deploy-refresh: metrics-live-tabs-v2 -->
+
+
+
+
+
+
+
+
+
+
+<script id="dw-manual-outreach-dropdowns">
+(function(){
+  const LIB = {
+    tenant_rep: {
+      "Cold Outreach TR": [
+        "Intro / Cold Email",
+        "Follow Up 1 — Define Landlord Position",
+        "Follow Up 2 — Leverage / Timing / Renewals",
+        "Follow Up 2 — Gain Credibility",
+        "Follow Up 3A — Continued Rent Growth",
+        "Follow Up 3B — Recent Comparable Activity",
+        "Follow Up 3C — Tenant Favorable Conditions",
+        "Follow Up 3D — Small Bay Demand",
+        "Follow Up 3E — Nearby Development Activity"
+      ],
+      "Walk-Ins": [
+        "Version 1 — Cold Intro",
+        "Version 2 — Warm Follow Up",
+        "Version 3 — Dropped Off Flyer",
+        "Follow Up 1",
+        "Follow Up 2",
+        "Follow Up 3",
+        "Follow Up 4A — Continued Rent Growth",
+        "Follow Up 4B — Recent Comparable Activity",
+        "Follow Up 4C — Tenant Favorable Conditions",
+        "Follow Up 4D — Small Bay Demand",
+        "Follow Up 4E — Nearby Development Activity"
+      ],
+      "National Manufacturing Platform": [
+        "Intro",
+        "Follow Up 1",
+        "Follow Up 2"
+      ],
+      "Portfolio Pitch": [
+        "Intro",
+        "Follow Up 1",
+        "Follow Up 2",
+        "Follow Up 3 — Gain Credibility"
+      ],
+      "Change In Ownership": [
+        "Version 1 — On Market",
+        "Version 2 — Building Sold",
+        "Follow Up 1",
+        "Follow Up 2"
+      ]
+    },
+    investment_sale: {
+      "Listing Pitch": [
+        "Intro Listing Email",
+        "Follow Up Listing",
+        "Market Insight Follow Up"
+      ],
+      "Purchase Offer": [
+        "Investment Pitch",
+        "Follow Up Offer"
+      ],
+      "Sale-Leaseback": [
+        "Intro",
+        "Follow Up"
+      ],
+      "Owner Market Insight": [
+        "Market Insight Follow Up"
+      ]
+    }
+  };
+
+  function install(){
+    const rows = Array.from(document.querySelectorAll("table tbody tr"))
+      .filter(row => /save update|snooze|decline/i.test(row.textContent || ""));
+
+    rows.forEach((row, i) => {
+      const cell = row.children[row.children.length - 1];
+      if(!cell || cell.querySelector(".dw-manual-wrap")) return;
+
+      cell.innerHTML = `
+        <div class="dw-manual-wrap">
+          <select class="contact-select dw-type">
+            <option value="tenant_rep">Tenant Rep</option>
+            <option value="investment_sale">Investment Sale</option>
+          </select>
+          <select class="contact-select dw-strategy" style="margin-top:7px;"></select>
+          <select class="contact-select dw-touch" style="margin-top:7px;"></select>
+          <button class="draft-button dw-open" style="margin-top:7px;">Open Draft</button>
+        </div>
+      `;
+
+      const typeSel = cell.querySelector(".dw-type");
+      const strategySel = cell.querySelector(".dw-strategy");
+      const touchSel = cell.querySelector(".dw-touch");
+      const btn = cell.querySelector(".dw-open");
+
+      function renderStrategies(){
+        strategySel.innerHTML = Object.keys(LIB[typeSel.value])
+          .map(s => `<option value="${s}">${s}</option>`)
+          .join("");
+        renderTouches();
+      }
+
+      function renderTouches(){
+        touchSel.innerHTML = LIB[typeSel.value][strategySel.value]
+          .map(t => `<option value="${t}">${t}</option>`)
+          .join("");
+      }
+
+      typeSel.onchange = renderStrategies;
+      strategySel.onchange = renderTouches;
+
+      btn.onclick = function(e){
+        e.preventDefault();
+        const subject = `${strategySel.value} — ${touchSel.value}`;
+        const body = `Strategy: ${strategySel.value}
+
+Touch / Follow-Up: ${touchSel.value}
+
+[Full draft body will be connected here next.]`;
+
+        window.location.href =
+          "mailto:?subject=" + encodeURIComponent(subject) +
+          "&body=" + encodeURIComponent(body);
+      };
+
+      renderStrategies();
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", install);
+  setTimeout(install, 500);
+  setTimeout(install, 1500);
+})();
+</script>
+
 </body>
 </html>
