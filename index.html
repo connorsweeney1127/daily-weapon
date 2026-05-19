@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daily Weapon Command Center</title>
+  <title>PursuitOS</title>
 <!-- WRITE-BACK UPGRADE: live all-tabs read + CRM write-back -->
 <!-- SAFE MULTI-TAB UPGRADE: built on metrics-fixed dashboard; layout preserved -->
   <style>
@@ -519,7 +519,7 @@
 <body>
 <main class="shell">
   <section class="topbar">
-    <div class="brand"><h1>Daily Weapon</h1><p>CRM Built For Closers</p></div>
+    <div class="brand"><h1>PursuitOS</h1><p>The Modern Brokerage Engine</p></div>
     <div class="nav-pills"><div class="pill blue">Connor Sweeney • CRE Command Center</div><div class="pill purple">Auto Outreach Queue</div><div class="pill green" id="liveClock">Loading time...</div></div>
   </section>
 
@@ -558,15 +558,15 @@
     <article class="metric-card ai-card metric-blue">
       <div class="metric-label">5. Total Outreach</div>
       <div class="metric-icon">➤</div>
-      <div class="metric-value" id="totalOutreachValue">2</div>
-      <input id="totalOutreachInput" type="number" value="2" />
+      <div class="metric-value" id="totalOutreachValue">0</div>
+      <input id="totalOutreachInput" type="number" value="0" />
     </article>
 
     <article class="metric-card ai-card metric-purple">
       <div class="metric-label">6. Conversion Rate</div>
       <div class="metric-icon">▱</div>
-      <div class="metric-value" id="conversionRateValue">0 / 0%</div>
-      <input id="conversionRateInput" type="text" value="0 / 0%" />
+      <div class="metric-value" id="conversionRateValue">0%</div>
+      <input id="conversionRateInput" type="text" value="0%" />
     </article>
 
     <article class="metric-card ai-card metric-green">
@@ -592,7 +592,7 @@
       <div class="app-card outreach" onclick="openApp('outreach')"><div class="app-icon">✉️</div><div class="app-title">Outreach Queue</div><div class="app-desc">Today’s companies, contacts, strategy, reason, and CRM update button.</div></div>
       <div class="app-card signals" onclick="openApp('signals')"><div class="app-icon">📍</div><div class="app-title">Signals</div><div class="app-desc">Daily signals with source links and automatic outreach routing.</div></div>
       <div class="app-card market" onclick="openApp('market')"><div class="app-icon">📈</div><div class="app-title">Market Intel</div><div class="app-desc">Market notes, broker angles, and comp request builder.</div></div>
-      <div class="app-card news" onclick="openApp('news')"><div class="app-icon">📰</div><div class="app-title">News</div><div class="app-desc">Daily source links for prospecting triggers.</div></div>
+      <div class="app-card news" onclick="openApp('addProspect')"><div class="app-icon">➕</div><div class="app-title">Add Prospect</div><div class="app-desc">Capture a new contact, company, property, strategy, and outreach timing.</div></div>
       <div class="app-card models" onclick="openApp('models')"><div class="app-icon">💵</div><div class="app-title">Financial Models</div><div class="app-desc">Lease analysis and underwriting.</div></div>
     </div>
     <div class="brain-strip" id="brainStrip"></div>
@@ -672,6 +672,51 @@
   </div>
 </div>
 
+
+<div class="note-modal" id="responseModal">
+  <div class="note-modal-card">
+    <h2 style="margin-top:0;">Record Response</h2>
+    <p style="color:#cbd5e1;">Log a prospect response, add a note, and route it to Hot Prospects, Dead / Nurture, or Follow Ups.</p>
+    <input id="responseProspectId" type="hidden">
+
+    <div class="field-label">Prospect</div>
+    <input id="responseProspectLabel" readonly>
+
+    <div class="field-label">Paste Email / Response</div>
+    <textarea id="responseRawEmail" placeholder="Paste the email response here if helpful."></textarea>
+
+    <div class="field-label">Response Note</div>
+    <textarea id="responseNote" placeholder="Example: Prospect replied and wants pricing. Add to Hot Prospects and follow up tomorrow."></textarea>
+
+    <div class="field-label">Route To</div>
+    <select id="responseDestination" onchange="responseDestinationChanged()">
+      <option value="Hot Prospects">Hot Prospects</option>
+      <option value="Follow Ups">Follow Ups</option>
+      <option value="Dead / Nurture">Dead / Nurture</option>
+    </select>
+
+    <div id="responseFollowupWrap">
+      <div class="field-label">Follow-Up Date</div>
+      <input id="responseFollowupDate" type="date">
+    </div>
+
+    <button class="success" onclick="saveRecordedResponseFromModal()">Save Response</button>
+    <button onclick="closeRecordResponseModal()">Cancel</button>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  try {
+    localStorage.setItem('dw_totalOutreach','0');
+    localStorage.setItem('dw_totalOutreachSheet','0');
+    localStorage.setItem('dw_conversionResponses','0');
+    localStorage.setItem('dw_responseCountSheet','0');
+    localStorage.setItem('dw_conversionRate','0');
+  } catch(e) {}
+})();
+</script>
 <script>
 const STRATEGIES = {
   coldIntro: "Cold Intro",
@@ -911,15 +956,251 @@ function openApp(app){
       outreach:["Outreach Queue","The Brain tells you who to contact, why, and with what template.",renderOutreach()],
       signals:["Signals","Signals can be informational or routed into outreach when matched.",renderSignals()],
       market:["Market Intel","Save market notes and broker angles.",renderMarketIntel()],
-      news:["News","Open daily news sources and convert important items into signals.",renderNews()],
+      addProspect:["Add Prospect","Capture new prospects and route them to CRM, waiting list, or Outreach Queue.",renderAddProspect()],
       models:["Financial Models","Open financial models and deal tools.",renderModels()]
     };
 
     openWorkspace(map[app][0], map[app][1], map[app][2]);
+    if(app === "models"){
+      setTimeout(() => {
+        refreshProposalComparison();
+      }, 50);
+    }
 
   } catch (e) {
     alert("Error loading app: " + app + "\n\n" + e.message);
   }
+}
+
+
+
+function renderAddProspect(){
+  return `
+    <div class="mini-card">
+      <div class="excel-toolbar">
+        <div>
+          <h3>➕ Add Prospect</h3>
+          <p>Add a new prospect into the dashboard memory and optionally push it directly into today’s Outreach Queue.</p>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="field-label">Company / Owner</div>
+          <input id="newProspectCompany" placeholder="Example: ABC Logistics">
+
+          <div class="field-label">Contact Name</div>
+          <input id="newProspectContact" placeholder="Example: John Smith">
+
+          <div class="field-label">Email</div>
+          <input id="newProspectEmail" placeholder="Example: john@company.com">
+
+          <div class="field-label">Phone</div>
+          <input id="newProspectPhone" placeholder="Example: 813-555-0100">
+        </div>
+
+        <div>
+          <div class="field-label">Property / Address</div>
+          <input id="newProspectProperty" placeholder="Example: 123 Industrial Blvd">
+
+          <div class="field-label">Agenda / Lane</div>
+          <select id="newProspectAgenda">
+            <option>Tenant Representation</option>
+            <option>Owner User</option>
+            <option>Investment Sales</option>
+            <option>Hot Prospects</option>
+            <option>Follow Ups</option>
+          </select>
+
+          <div class="field-label">Strategy</div>
+          <select id="newProspectStrategy">
+            <option value="coldIntro">Cold Intro</option>
+            <option value="followUp">Follow-Up</option>
+            <option value="marketInsight">Market Insight</option>
+            <option value="expansionSignal">Expansion Signal</option>
+            <option value="leaseExpiration">Lease Expiration</option>
+            <option value="buildingForSale">Building For Sale Tenant Play</option>
+            <option value="researchLead">Research New Lead</option>
+          </select>
+
+          <div class="field-label">Follow-Up Date</div>
+          <input id="newProspectFollowupDate" type="date">
+        </div>
+      </div>
+
+      <div class="field-label">Next Step</div>
+      <input id="newProspectNextStep" placeholder="Example: Send first touch email">
+
+      <div class="field-label">Notes / Reason</div>
+      <textarea id="newProspectNotes" placeholder="Why this prospect matters, what angle to use, or where the lead came from."></textarea>
+
+      <label style="display:flex;align-items:center;gap:10px;margin:14px 0;color:#dbeafe;font-weight:900;">
+        <input id="newProspectAddToOutreach" type="checkbox" style="width:auto;margin:0;" checked>
+        Add to today’s Outreach Queue
+      </label>
+
+      <button class="success" onclick="saveAddedProspect()">Save Prospect</button>
+    </div>
+  `;
+}
+
+function saveAddedProspect(){
+  const company = document.getElementById("newProspectCompany")?.value.trim() || "";
+  const contact = document.getElementById("newProspectContact")?.value.trim() || "";
+  const email = document.getElementById("newProspectEmail")?.value.trim() || "";
+  const phone = document.getElementById("newProspectPhone")?.value.trim() || "";
+  const property = document.getElementById("newProspectProperty")?.value.trim() || "";
+  const agenda = document.getElementById("newProspectAgenda")?.value || "Tenant Representation";
+  const strategy = document.getElementById("newProspectStrategy")?.value || "coldIntro";
+  const followupDate = document.getElementById("newProspectFollowupDate")?.value || "";
+  const nextStep = document.getElementById("newProspectNextStep")?.value.trim() || "Start outreach";
+  const notes = document.getElementById("newProspectNotes")?.value.trim() || "";
+  const addToOutreach = document.getElementById("newProspectAddToOutreach")?.checked;
+
+  if(!company && !property){
+    alert("Add at least a company/owner or property/address.");
+    return;
+  }
+
+  const id = "p_manual_" + Date.now();
+  const prospect = {
+    id,
+    company,
+    contact,
+    email,
+    phone,
+    property,
+    agenda,
+    sourceTab: agenda,
+    strategy,
+    strategyLabel: STRATEGIES[strategy] || strategy,
+    followupDate,
+    nextStep,
+    notes,
+    stage: "New",
+    priority: agenda === "Hot Prospects" ? "High" : "Medium",
+    createdAt: new Date().toISOString(),
+    manuallyAdded: true
+  };
+
+  Brain.prospects.unshift(prospect);
+
+  if(addToOutreach){
+    const today = todayISO();
+    Brain.outreachQueue.unshift({
+      id: "q_manual_" + today + "_" + id,
+      date: today,
+      actionDate: today,
+      company: prospect.company,
+      property: prospect.property || "",
+      contact: prospect.contact || "",
+      prospectId: prospect.id,
+      signalId: "",
+      sourceType: agenda,
+      strategy,
+      reason: notes || nextStep || "Manually added prospect.",
+      source: "Add Prospect app",
+      sourceUrl: "",
+      matchScore: prospect.priority === "High" ? 95 : 70,
+      status: "Open",
+      suggestedTask: nextStep || "Start outreach"
+    });
+  }
+
+  Brain.save();
+  refreshAll();
+  alert("Prospect added successfully.");
+  openApp(addToOutreach ? "outreach" : "crm");
+}
+
+
+
+function openRecordResponseModal(prospectId){
+  const p = Brain.prospects.find(x => x.id === prospectId);
+  if(!p){
+    alert("Prospect not found.");
+    return;
+  }
+
+  const modal = document.getElementById("responseModal");
+  if(!modal){
+    alert("Record Response modal is missing.");
+    return;
+  }
+
+  document.getElementById("responseProspectId").value = prospectId;
+  document.getElementById("responseProspectLabel").value = [
+    p.company || p.owner || "Unnamed Prospect",
+    p.contact || "",
+    p.property || p.address || ""
+  ].filter(Boolean).join(" — ");
+
+  document.getElementById("responseRawEmail").value = "";
+  document.getElementById("responseNote").value = "";
+  document.getElementById("responseDestination").value = "Hot Prospects";
+
+  const nextWeek = new Date();
+  nextWeek.setDate(nextWeek.getDate() + 7);
+  document.getElementById("responseFollowupDate").value = nextWeek.toISOString().split("T")[0];
+
+  responseDestinationChanged();
+  modal.style.display = "flex";
+}
+
+function closeRecordResponseModal(){
+  const modal = document.getElementById("responseModal");
+  if(modal) modal.style.display = "none";
+}
+
+function responseDestinationChanged(){
+  const dest = document.getElementById("responseDestination")?.value || "Follow Ups";
+  const wrap = document.getElementById("responseFollowupWrap");
+  if(wrap) wrap.style.display = dest === "Dead / Nurture" ? "none" : "block";
+}
+
+function saveRecordedResponseFromModal(){
+  const prospectId = document.getElementById("responseProspectId")?.value || "";
+  const p = Brain.prospects.find(x => x.id === prospectId);
+  if(!p){
+    alert("Prospect not found.");
+    return;
+  }
+
+  const rawEmail = document.getElementById("responseRawEmail")?.value.trim() || "";
+  const note = document.getElementById("responseNote")?.value.trim() || "";
+  const destination = document.getElementById("responseDestination")?.value || "Follow Ups";
+  const followupDate = document.getElementById("responseFollowupDate")?.value || "";
+
+  const timestamp = new Date().toLocaleString();
+  const responseNote = `[Response ${timestamp}] Routed to ${destination}. ${note}${rawEmail ? "\nRaw response: " + rawEmail : ""}`;
+
+  p.notes = [p.notes || "", responseNote].filter(Boolean).join("\n");
+  p.lastResponseDate = todayISO();
+  p.lastContacted = todayISO();
+
+  if(destination === "Hot Prospects"){
+    p.stage = "Hot Prospect";
+    p.priority = "High";
+    p.agenda = "Hot Prospects";
+    p.sourceTab = p.sourceTab || "Hot Prospects";
+    p.followupDate = followupDate || p.followupDate || "";
+    p.nextStep = note || "Follow up on prospect response";
+  } else if(destination === "Follow Ups"){
+    p.stage = "Follow-Up";
+    p.agenda = p.agenda || "Follow Ups";
+    p.followupDate = followupDate || p.followupDate || "";
+    p.nextStep = note || "Follow up on prospect response";
+  } else {
+    p.stage = "Dead / Nurture";
+    p.agenda = p.agenda || "Follow Ups";
+    p.nextStep = note || "No active next step";
+  }
+
+  Brain.save();
+  refreshAll();
+  closeRecordResponseModal();
+  alert("Response recorded successfully.");
+  openApp("crm");
 }
 
 
@@ -1011,6 +1292,7 @@ function crmTableHTML(rows){
               <td class="table-actions">
                 <button onclick="quickCRMWriteBack('${esc(p.id)}','note')">Add Note</button>
                 <button onclick="quickCRMWriteBack('${esc(p.id)}','call')">Log Call</button>
+                <button class="success" onclick="openRecordResponseModal('${esc(p.id)}')">Record Response</button>
                 <button class="success" onclick="queueAgendaProspect('${esc(p.id)}')">Add to Outreach</button>
               </td>
             </tr>
@@ -2844,29 +3126,249 @@ function addSignal(){
   refreshAll();
   openApp('signals');
 }
+
 function renderMarketIntel(){
   return `
-    <div class="two-col">
-      <div class="mini-card">
-        <h3>Market Intel</h3>
-        <p>Use this section for Tampa market notes, broker angles, rent/vacancy thoughts, and anything that should feed outreach.</p>
-        <textarea id="marketIntelNote" placeholder="Paste or write market notes here..."></textarea>
-        <button class="success" onclick="saveMarketIntelNote()">Save Market Note</button>
+    <div class="mini-card">
+      <div class="excel-toolbar">
+        <div>
+          <h3>📈 Tampa Industrial Market Intel — Q1 2026</h3>
+          <p>Built from the latest Tampa Industrial market report. Use this section for talking points, prospecting angles, and comp context.</p>
+        </div>
+        <div class="excel-toolbar-right">
+          <button class="success" onclick="loadCompsFromGoogle()">Refresh Market Comps</button>
+        </div>
       </div>
 
-      <div class="mini-card">
-        <h3>Comp Request Builder</h3>
-        <p>Comp data now lives inside Market Intel.</p>
-        <input id="compMarket" placeholder="Market / submarket">
-        <input id="compSize" placeholder="Size range">
-        <input id="compType" placeholder="Asset type">
-        <textarea id="compOutput" placeholder="Generated comp request will appear here..."></textarea>
-        <button onclick="buildCompRequest()">Build Request</button>
-        <button onclick="navigator.clipboard.writeText(compOutput.value); alert('Comp request copied.')">Copy</button>
+      <div class="metrics two-row ai-metrics-grid">
+        <article class="metric-card ai-card metric-blue">
+          <div class="metric-label">Vacancy Rate</div>
+          <div class="metric-icon">%</div>
+          <div class="metric-value">7.5%</div>
+        </article>
+        <article class="metric-card ai-card metric-purple">
+          <div class="metric-label">Net Absorption</div>
+          <div class="metric-icon">SF</div>
+          <div class="metric-value">286K</div>
+        </article>
+        <article class="metric-card ai-card metric-green">
+          <div class="metric-label">Avg Asking Rent</div>
+          <div class="metric-icon">$</div>
+          <div class="metric-value">$10.95</div>
+        </article>
+        <article class="metric-card ai-card metric-orange">
+          <div class="metric-label">Under Construction</div>
+          <div class="metric-icon">▥</div>
+          <div class="metric-value">3.8M</div>
+        </article>
+      </div>
+
+      <div class="two-col">
+        <div class="mini-card" style="background:radial-gradient(circle at 90% 15%,rgba(56,189,248,.22),transparent 32%),linear-gradient(135deg,rgba(14,165,233,.12),rgba(15,23,42,.86));border-color:rgba(56,189,248,.32);box-shadow:0 18px 50px rgba(0,0,0,.28);">
+          <div class="badge">Market Read</div>
+          <h3 style="font-size:24px;margin:10px 0;">Normalized, Not Weak</h3>
+          <p>Tampa industrial is moving into a more balanced phase. Vacancy and availability are up as recent deliveries are absorbed, but the softness is not evenly spread.</p>
+          <p><strong>Core angle:</strong> infill space and buildings under 100,000 SF remain tight, while larger-format and outlying space account for most available inventory.</p>
+        </div>
+
+        <div class="mini-card" style="background:radial-gradient(circle at 90% 15%,rgba(167,139,250,.24),transparent 32%),linear-gradient(135deg,rgba(124,58,237,.14),rgba(15,23,42,.86));border-color:rgba(167,139,250,.34);box-shadow:0 18px 50px rgba(0,0,0,.28);">
+          <div class="badge purple">Broker Angle</div>
+          <h3 style="font-size:24px;margin:10px 0;">Leverage Is Back</h3>
+          <p>Tenants have more options than they did in the 2023 low-vacancy environment, especially in outlying submarkets and larger size ranges.</p>
+          <p><strong>Prospecting angle:</strong> use this to push renewal, relocation, survey, and right-size conversations before tenants wait too long.</p>
+        </div>
+      </div>
+
+      <div class="mini-card" style="margin-top:14px;">
+        <h3>Submarket Highlights</h3>
+        <div class="outreach-table-wrap">
+          <table class="outreach-table">
+            <thead>
+              <tr>
+                <th>Submarket</th>
+                <th>Vacancy</th>
+                <th>Availability</th>
+                <th>Avg. Direct Asking Rate</th>
+                <th>Qtr. Net Absorption</th>
+                <th>Broker Angle</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="table-company">East Tampa</td>
+                <td>5.1%</td>
+                <td>9.1%</td>
+                <td>$11.54/SF NNN</td>
+                <td>(157K SF)</td>
+                <td class="table-reason">Strong core industrial market with near-term tenant leverage from negative absorption.</td>
+              </tr>
+              <tr>
+                <td class="table-company">Plant City</td>
+                <td>12.7%</td>
+                <td>12.4%</td>
+                <td>$7.82/SF NNN</td>
+                <td>311K SF</td>
+                <td class="table-reason">Value-oriented alternative for users priced out of infill Tampa.</td>
+              </tr>
+              <tr>
+                <td class="table-company">Pasco County</td>
+                <td>16.4%</td>
+                <td>19.0%</td>
+                <td>$11.32/SF NNN</td>
+                <td>1K SF</td>
+                <td class="table-reason">Large construction pipeline and higher vacancy create optionality for bigger users.</td>
+              </tr>
+              <tr>
+                <td class="table-company">Airport</td>
+                <td>6.6%</td>
+                <td>9.0%</td>
+                <td>$13.52/SF NNN</td>
+                <td>8K SF</td>
+                <td class="table-reason">Premium infill location; useful benchmark for centrally located requirements.</td>
+              </tr>
+              <tr>
+                <td class="table-company">Southeast Tampa</td>
+                <td>10.8%</td>
+                <td>10.8%</td>
+                <td>$10.45/SF NNN</td>
+                <td>278K SF</td>
+                <td class="table-reason">Positive absorption story tied to larger user commitments.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mini-card" style="margin-top:14px;">
+        <h3>Stats by Product Type</h3>
+        <div class="task-bucket-grid">
+          <div class="task-bucket">
+            <div class="task-bucket-icon">🚚</div>
+            <div class="task-bucket-title">Distribution / Logistics</div>
+            <div class="table-muted">122.05 MSF inventory, 8.7% vacancy, 11.1% availability, $10.84/SF avg asking rent, and 496K SF Q1 absorption.</div>
+          </div>
+          <div class="task-bucket">
+            <div class="task-bucket-icon">🏭</div>
+            <div class="task-bucket-title">Manufacturing — General</div>
+            <div class="table-muted">30.88 MSF inventory, 3.6% vacancy, 5.9% availability, $10.49/SF avg asking rent, and negative 183K SF Q1 absorption.</div>
+          </div>
+          <div class="task-bucket">
+            <div class="task-bucket-icon">🔬</div>
+            <div class="task-bucket-title">R&amp;D / Flex</div>
+            <div class="table-muted">12.70 MSF inventory, 5.2% vacancy, 7.6% availability, $14.15/SF avg asking rent, and negative 26K SF Q1 absorption.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mini-card" style="margin-top:14px;">
+        <div class="excel-toolbar">
+          <div>
+            <h3>📊 Market Comps</h3>
+            <p>This table is designed to populate from your Google Sheet tab named <strong>Comps</strong> or <strong>cComps</strong>. Click refresh after your Apps Script exposes that tab.</p>
+          </div>
+          <div class="excel-toolbar-right">
+            <button class="success" onclick="loadCompsFromGoogle()">Refresh Comps</button>
+          </div>
+        </div>
+        <div id="marketCompsStatus" class="table-muted">Waiting for Comps sync.</div>
+        <div id="marketCompsSlot">${marketCompsHTML()}</div>
       </div>
     </div>
   `;
 }
+
+function marketCompsHTML(){
+  const comps = JSON.parse(localStorage.getItem("dw_marketComps") || "[]");
+  if(!comps.length){
+    return `
+      <div class="outreach-table-wrap">
+        <table class="outreach-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Tenant / Buyer</th>
+              <th>Submarket</th>
+              <th>Size</th>
+              <th>Rate / Price</th>
+              <th>Date</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="7" class="table-reason">No comps loaded yet. This section will populate from the cComps tab once synced.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="outreach-table-wrap">
+      <table class="outreach-table">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Tenant / Buyer</th>
+            <th>Submarket</th>
+            <th>Size</th>
+            <th>Rate / Price</th>
+            <th>Date</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${comps.map(c => `
+            <tr>
+              <td class="table-company">${esc(c.property || c.address || c.Property || c.Address || "—")}</td>
+              <td>${esc(c.tenant || c.buyer || c.company || c.Tenant || c.Buyer || c.Company || "—")}</td>
+              <td>${esc(c.submarket || c.market || c.Submarket || c.Market || "—")}</td>
+              <td>${esc(c.size || c.sf || c.SF || c.Size || "—")}</td>
+              <td>${esc(c.rate || c.price || c.Rate || c.Price || "—")}</td>
+              <td>${esc(c.date || c.Date || "—")}</td>
+              <td class="table-reason">${esc(c.notes || c.Notes || c.note || "—")}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+async function loadCompsFromGoogle(){
+  const status = document.getElementById("marketCompsStatus");
+  if(status) status.textContent = "Refreshing Comps from Google Sheets...";
+
+  try {
+    if(typeof GOOGLE_SCRIPT_URL === "undefined" || !GOOGLE_SCRIPT_URL){
+      if(status) status.textContent = "Google Script URL not found in this file. cComps table is ready, but live sync needs the script endpoint.";
+      return;
+    }
+
+    let url = GOOGLE_SCRIPT_URL + (GOOGLE_SCRIPT_URL.includes("?") ? "&" : "?") + "tab=Comps";
+    let res = await fetch(url);
+    let data = await res.json();
+
+    let rows = Array.isArray(data) ? data : (data.rows || data.data || data.comps || []);
+
+    if(!rows.length){
+      url = GOOGLE_SCRIPT_URL + (GOOGLE_SCRIPT_URL.includes("?") ? "&" : "?") + "tab=cComps";
+      res = await fetch(url);
+      data = await res.json();
+      rows = Array.isArray(data) ? data : (data.rows || data.data || data.comps || []);
+    }
+    localStorage.setItem("dw_marketComps", JSON.stringify(rows));
+
+    const slot = document.getElementById("marketCompsSlot");
+    if(slot) slot.innerHTML = marketCompsHTML();
+    if(status) status.textContent = "Comps loaded: " + rows.length + " records.";
+  } catch(e){
+    if(status) status.textContent = "Could not load cComps yet: " + e.message;
+  }
+}
+
+
 
 function saveMarketIntelNote(){
   const note = document.getElementById("marketIntelNote")?.value || "";
@@ -2902,12 +3404,380 @@ function buildCompRequest(){
   compOutput.value = `Can you please send relevant comps for:\\n\\nMarket/Submarket: ${compMarket.value || "[Market]"}\\nSize Range: ${compSize.value || "[Size range]"}\\nAsset Type: ${compType.value || "[Asset type]"}\\n\\nPlease include lease comps, sale comps if available, asking rents, achieved rents, date, tenant/buyer, landlord/seller, address, building size, clear height where applicable, and notes on concessions or TI.`;
 }
 
+
 function renderModels(){
-  return `<div class="three-col"><div class="mini-card"><h3>Financial Model</h3><button onclick="window.open('Daily_Weapon_Financial_Model.xlsx','_blank')">Open Model</button></div><div class="mini-card"><h3>Commission Tracker</h3><p>Comes next.</p></div><div class="mini-card"><h3>Lease Analysis</h3><p>Comes next.</p></div></div>`;
+  return `
+    <div class="mini-card">
+      <div class="excel-toolbar">
+        <div>
+          <h3>💵 Financial Analysis</h3>
+          <p>Lease spend, sale underwriting, proposal comparison, and quick proposal cards.</p>
+        </div>
+        <div class="excel-toolbar-right">
+          <button onclick="scrollToFinancialSection('leaseAnalysisBox')">Lease Analysis</button>
+          <button onclick="scrollToFinancialSection('saleUnderwritingBox')">Sale Underwriting</button>
+          <button onclick="scrollToFinancialSection('proposalAnalysisBox')">Proposal Analysis</button>
+          <button onclick="scrollToFinancialSection('proposalComparisonBox')">Proposal Comparison</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="mini-card" id="leaseAnalysisBox" style="background:radial-gradient(circle at 90% 15%,rgba(56,189,248,.20),transparent 32%),linear-gradient(135deg,rgba(14,165,233,.10),rgba(15,23,42,.86));border-color:rgba(56,189,248,.28);">
+          <div class="badge">Lease</div>
+          <h3>Lease Analysis</h3>
+          <p>Quick monthly, annual, and full-term lease spend.</p>
+
+          <div class="two-col">
+            <div>
+              <div class="field-label">Square Feet</div>
+              <input id="leaseSF" type="number" value="25000">
+            </div>
+            <div>
+              <div class="field-label">Base Rent ($/SF/YR)</div>
+              <input id="leaseBaseRent" type="number" value="12.50" step="0.01">
+            </div>
+            <div>
+              <div class="field-label">NNN / Operating ($/SF/YR)</div>
+              <input id="leaseNNN" type="number" value="3.25" step="0.01">
+            </div>
+            <div>
+              <div class="field-label">Term (Months)</div>
+              <input id="leaseTerm" type="number" value="60">
+            </div>
+            <div>
+              <div class="field-label">Annual Escalation (%)</div>
+              <input id="leaseEscalation" type="number" value="3" step="0.01">
+            </div>
+            <div>
+              <div class="field-label">Free Rent (Months)</div>
+              <input id="leaseFreeRent" type="number" value="0">
+            </div>
+          </div>
+
+          <button class="success" onclick="calculateLeaseAnalysis()" style="margin-top:14px;">Calculate Lease Analysis</button>
+
+          <div class="metrics two-row" style="grid-template-columns:repeat(4,1fr);">
+            <div class="mini-card"><div class="metric-label">Monthly Base</div><div class="metric-value" id="leaseMonthlyBase" style="font-size:24px;">—</div></div>
+            <div class="mini-card"><div class="metric-label">Monthly Total</div><div class="metric-value" id="leaseMonthlyTotal" style="font-size:24px;">—</div></div>
+            <div class="mini-card"><div class="metric-label">Year 1 Spend</div><div class="metric-value" id="leaseYearOne" style="font-size:24px;">—</div></div>
+            <div class="mini-card"><div class="metric-label">Term Spend</div><div class="metric-value" id="leaseTermSpend" style="font-size:24px;">—</div></div>
+          </div>
+        </div>
+
+        <div class="mini-card" id="saleUnderwritingBox" style="background:radial-gradient(circle at 90% 15%,rgba(251,191,36,.20),transparent 32%),linear-gradient(135deg,rgba(251,191,36,.10),rgba(15,23,42,.86));border-color:rgba(251,191,36,.28);">
+          <div class="badge">Sale</div>
+          <h3>Sale Underwriting</h3>
+          <p>Quick math for vacant or leased sale opportunities.</p>
+
+          <div class="two-col">
+            <div>
+              <div class="field-label">Purchase Price</div>
+              <input id="salePurchasePrice" type="number" value="4500000">
+            </div>
+            <div>
+              <div class="field-label">Building SF</div>
+              <input id="saleBuildingSF" type="number" value="25000">
+            </div>
+            <div>
+              <div class="field-label">In-Place NOI</div>
+              <input id="saleNOI" type="number" value="315000">
+            </div>
+            <div>
+              <div class="field-label">Target Cap Rate (%)</div>
+              <input id="saleTargetCap" type="number" value="7.25" step="0.01">
+            </div>
+          </div>
+
+          <button class="success" onclick="calculateSaleUnderwriting()" style="margin-top:14px;">Calculate Sale Underwriting</button>
+
+          <div class="metrics two-row" style="grid-template-columns:repeat(4,1fr);">
+            <div class="mini-card"><div class="metric-label">Price / SF</div><div class="metric-value" id="salePricePSF" style="font-size:24px;">—</div></div>
+            <div class="mini-card"><div class="metric-label">Implied Cap</div><div class="metric-value" id="saleImpliedCap" style="font-size:24px;">—</div></div>
+            <div class="mini-card"><div class="metric-label">Value @ Target</div><div class="metric-value" id="saleTargetValue" style="font-size:24px;">—</div></div>
+            <div class="mini-card"><div class="metric-label">Spread To Target</div><div class="metric-value" id="saleSpread" style="font-size:24px;">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mini-card" id="proposalAnalysisBox" style="margin-top:14px;background:radial-gradient(circle at 90% 15%,rgba(34,197,94,.18),transparent 32%),linear-gradient(135deg,rgba(34,197,94,.08),rgba(15,23,42,.88));border-color:rgba(34,197,94,.25);">
+        <div class="excel-toolbar">
+          <div>
+            <h3>Proposal Analysis</h3>
+            <p>Add proposal options manually and compare economics side by side.</p>
+          </div>
+          <div class="excel-toolbar-right">
+            <button class="success" onclick="addProposalOption()">Run / Add Proposal To Comparison</button>
+            <button onclick="clearProposalOptions()">Clear Proposals</button>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <div class="field-label">Proposal Name</div>
+            <input id="proposalName" placeholder="Example: Option A - East Tampa">
+          </div>
+          <div>
+            <div class="field-label">Building / Address</div>
+            <input id="proposalAddress" placeholder="Example: 123 Industrial Blvd">
+          </div>
+          <div>
+            <div class="field-label">SF</div>
+            <input id="proposalSF" type="number" placeholder="25000">
+          </div>
+          <div>
+            <div class="field-label">Base Rent ($/SF/YR)</div>
+            <input id="proposalBaseRent" type="number" step="0.01" placeholder="12.50">
+          </div>
+          <div>
+            <div class="field-label">NNN / Opex ($/SF/YR)</div>
+            <input id="proposalNNN" type="number" step="0.01" placeholder="3.25">
+          </div>
+          <div>
+            <div class="field-label">Term (Months)</div>
+            <input id="proposalTerm" type="number" placeholder="60">
+          </div>
+          <div>
+            <div class="field-label">Free Rent (Months)</div>
+            <input id="proposalFreeRent" type="number" placeholder="0">
+          </div>
+          <div>
+            <div class="field-label">TI Allowance ($/SF)</div>
+            <input id="proposalTI" type="number" step="0.01" placeholder="0">
+          </div>
+        </div>
+
+        <div class="field-label">Notes</div>
+        <textarea id="proposalNotes" placeholder="Concessions, renewal options, delivery timing, landlord notes, etc."></textarea>
+      </div>
+
+      <div class="mini-card" id="proposalComparisonBox" style="margin-top:14px;">
+        <div class="excel-toolbar">
+          <div>
+            <h3>Proposal Comparison</h3>
+            <p>Side-by-side comparison table for loaded proposal options.</p>
+          </div>
+          <div class="excel-toolbar-right">
+            <span class="badge purple" id="proposalCountBadge">0 proposals</span>
+          </div>
+        </div>
+        <div id="proposalComparisonSlot">${proposalComparisonHTML()}</div>
+      </div>
+
+      <div class="mini-card" style="margin-top:14px;">
+        <h3>Proposal Cards</h3>
+        <p>Fast visual read on each proposal so you can spot leaders without digging through raw docs.</p>
+        <div id="proposalCardsSlot">${proposalCardsHTML()}</div>
+      </div>
+    </div>
+  `;
 }
 
-updateClock();
-setInterval(updateClock,1000);
+function money(n){
+  const num = Number(n || 0);
+  return num.toLocaleString("en-US", {style:"currency", currency:"USD", maximumFractionDigits:0});
+}
+
+function num(n){
+  return Number(n || 0).toLocaleString("en-US");
+}
+
+function pct(n){
+  return (Number(n || 0)).toFixed(2) + "%";
+}
+
+function calculateLeaseAnalysis(){
+  const sf = Number(document.getElementById("leaseSF")?.value || 0);
+  const base = Number(document.getElementById("leaseBaseRent")?.value || 0);
+  const nnn = Number(document.getElementById("leaseNNN")?.value || 0);
+  const term = Number(document.getElementById("leaseTerm")?.value || 0);
+  const esc = Number(document.getElementById("leaseEscalation")?.value || 0) / 100;
+  const free = Number(document.getElementById("leaseFreeRent")?.value || 0);
+
+  const monthlyBase = sf * base / 12;
+  const monthlyTotal = sf * (base + nnn) / 12;
+  const yearOne = Math.max(0, 12 - free) * monthlyTotal;
+
+  let total = 0;
+  for(let m=1; m<=term; m++){
+    const yearIndex = Math.floor((m-1) / 12);
+    const escalatedBase = base * Math.pow(1 + esc, yearIndex);
+    const monthly = sf * (escalatedBase + nnn) / 12;
+    if(m > free) total += monthly;
+  }
+
+  const set = (id, value) => { const el=document.getElementById(id); if(el) el.textContent=value; };
+  set("leaseMonthlyBase", money(monthlyBase));
+  set("leaseMonthlyTotal", money(monthlyTotal));
+  set("leaseYearOne", money(yearOne));
+  set("leaseTermSpend", money(total));
+}
+
+function calculateSaleUnderwriting(){
+  const price = Number(document.getElementById("salePurchasePrice")?.value || 0);
+  const sf = Number(document.getElementById("saleBuildingSF")?.value || 0);
+  const noi = Number(document.getElementById("saleNOI")?.value || 0);
+  const targetCap = Number(document.getElementById("saleTargetCap")?.value || 0) / 100;
+
+  const pricePSF = sf ? price / sf : 0;
+  const impliedCap = price ? (noi / price) * 100 : 0;
+  const targetValue = targetCap ? noi / targetCap : 0;
+  const spread = targetValue - price;
+
+  const set = (id, value) => { const el=document.getElementById(id); if(el) el.textContent=value; };
+  set("salePricePSF", money(pricePSF));
+  set("saleImpliedCap", pct(impliedCap));
+  set("saleTargetValue", money(targetValue));
+  set("saleSpread", money(spread));
+}
+
+function getProposalOptions(){
+  return JSON.parse(localStorage.getItem("dw_proposalOptions") || "[]");
+}
+
+function saveProposalOptions(rows){
+  localStorage.setItem("dw_proposalOptions", JSON.stringify(rows));
+}
+
+function addProposalOption(){
+  const option = {
+    id: "proposal_" + Date.now(),
+    name: document.getElementById("proposalName")?.value.trim() || "Unnamed Proposal",
+    address: document.getElementById("proposalAddress")?.value.trim() || "",
+    sf: Number(document.getElementById("proposalSF")?.value || 0),
+    baseRent: Number(document.getElementById("proposalBaseRent")?.value || 0),
+    nnn: Number(document.getElementById("proposalNNN")?.value || 0),
+    term: Number(document.getElementById("proposalTerm")?.value || 0),
+    freeRent: Number(document.getElementById("proposalFreeRent")?.value || 0),
+    ti: Number(document.getElementById("proposalTI")?.value || 0),
+    notes: document.getElementById("proposalNotes")?.value.trim() || ""
+  };
+
+  if(!option.sf || !option.baseRent){
+    alert("Add at least SF and Base Rent before saving a proposal.");
+    return;
+  }
+
+  const rows = getProposalOptions();
+  rows.push(option);
+  saveProposalOptions(rows);
+  refreshProposalComparison();
+}
+
+function clearProposalOptions(){
+  if(!confirm("Clear all proposal options?")) return;
+  saveProposalOptions([]);
+  refreshProposalComparison();
+}
+
+function proposalMetrics(p){
+  const monthlyBase = p.sf * p.baseRent / 12;
+  const monthlyTotal = p.sf * (p.baseRent + p.nnn) / 12;
+  const grossTerm = monthlyTotal * p.term;
+  const freeRentValue = monthlyTotal * p.freeRent;
+  const netTerm = Math.max(0, grossTerm - freeRentValue);
+  const tiValue = p.sf * p.ti;
+  const netAfterTI = Math.max(0, netTerm - tiValue);
+  const effectivePSF = p.sf && p.term ? (netAfterTI / (p.term / 12)) / p.sf : 0;
+  return {monthlyBase, monthlyTotal, grossTerm, freeRentValue, tiValue, netTerm, netAfterTI, effectivePSF};
+}
+
+function proposalComparisonHTML(){
+  const rows = getProposalOptions();
+  if(!rows.length){
+    return `
+      <div class="outreach-table-wrap">
+        <table class="outreach-table">
+          <thead><tr><th>Metric</th><th>Upload / Add Proposals To Compare</th></tr></thead>
+          <tbody><tr><td>Status</td><td>Drop or enter one or more proposals above to populate the comparison table.</td></tr></tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="outreach-table-wrap">
+      <table class="outreach-table">
+        <thead>
+          <tr>
+            <th>Proposal</th>
+            <th>Address</th>
+            <th>SF</th>
+            <th>Base Rent</th>
+            <th>NNN</th>
+            <th>Monthly Total</th>
+            <th>Free Rent Value</th>
+            <th>TI Value</th>
+            <th>Net Term Cost</th>
+            <th>Effective Rent</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(p => {
+            const m = proposalMetrics(p);
+            return `
+              <tr>
+                <td class="table-company">${esc(p.name)}</td>
+                <td>${esc(p.address || "—")}</td>
+                <td>${num(p.sf)}</td>
+                <td>${money(p.baseRent)} / SF</td>
+                <td>${money(p.nnn)} / SF</td>
+                <td>${money(m.monthlyTotal)}</td>
+                <td>${money(m.freeRentValue)}</td>
+                <td>${money(m.tiValue)}</td>
+                <td>${money(m.netAfterTI)}</td>
+                <td>${money(m.effectivePSF)} / SF/YR</td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function proposalCardsHTML(){
+  const rows = getProposalOptions();
+  if(!rows.length){
+    return `<div class="mini-card" style="text-align:center;">No proposals loaded yet.</div>`;
+  }
+
+  return `
+    <div class="task-bucket-grid">
+      ${rows.map(p => {
+        const m = proposalMetrics(p);
+        return `
+          <div class="task-bucket">
+            <div class="task-bucket-icon">📄</div>
+            <div class="task-bucket-title">${esc(p.name)}</div>
+            <div class="table-muted">${esc(p.address || "No address listed")}</div>
+            <div class="date-badge">${num(p.sf)} SF</div>
+            <p><strong>Monthly:</strong> ${money(m.monthlyTotal)}</p>
+            <p><strong>Effective:</strong> ${money(m.effectivePSF)} / SF/YR</p>
+            <p><strong>Net Term Cost:</strong> ${money(m.netAfterTI)}</p>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function refreshProposalComparison(){
+  const comparison = document.getElementById("proposalComparisonSlot");
+  const cards = document.getElementById("proposalCardsSlot");
+  const badge = document.getElementById("proposalCountBadge");
+  const rows = getProposalOptions();
+
+  if(comparison) comparison.innerHTML = proposalComparisonHTML();
+  if(cards) cards.innerHTML = proposalCardsHTML();
+  if(badge) badge.textContent = rows.length + " proposals";
+}
+
+function scrollToFinancialSection(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+
 
 function bindTopMetric(inputId, valueId, storageKey, formatter){
   const input = document.getElementById(inputId);
@@ -2958,17 +3828,18 @@ function countResponses(){
 }
 
 function updateOutreachConversionMetrics(){
-  const total = countTotalOutreach();
-  const responses = countResponses();
-  const rate = total ? Math.round((responses / total) * 1000) / 10 : 0;
+  const total = 0;
+  const responses = 0;
   setDashboardMetric("totalOutreachInput", "totalOutreachValue", "dw_totalOutreach", total, numberFormat);
-  const conversionText = `${responses} / ${percentFormat(rate)}`;
+  const conversionText = "0%";
   const conversionInput = document.getElementById("conversionRateInput");
   const conversionValue = document.getElementById("conversionRateValue");
   if(conversionInput) conversionInput.value = conversionText;
   if(conversionValue) conversionValue.textContent = conversionText;
-  localStorage.setItem("dw_conversionResponses", String(responses));
-  localStorage.setItem("dw_conversionRate", String(rate));
+  localStorage.setItem("dw_conversionResponses", "0");
+  localStorage.setItem("dw_conversionRate", "0");
+  localStorage.setItem("dw_responseCountSheet", "0");
+  localStorage.setItem("dw_totalOutreachSheet", "0");
 }
 
 function refreshDashboardMetricsFromLocal(){
@@ -4014,7 +4885,7 @@ const DW_METRIC_DEFAULTS = {
   totalRevenue: 56307.80,
   sfLeasedSold: 10798,
   listings: 5,
-  totalOutreach: 2,
+  totalOutreach:0,
   responses: 0,
   liveTransactions: 13,
   potentialClosings: 9
@@ -4061,7 +4932,7 @@ function dwPaintStoredMetrics(){
   const responses = Math.max(dwSafeMetricNumber(localStorage.getItem('dw_conversionResponses')), dwSafeMetricNumber(localStorage.getItem('dw_responseCountSheet')), DW_METRIC_DEFAULTS.responses);
   const rate = total ? Math.round((responses / total) * 1000) / 10 : 0;
   dwSetMetric('totalOutreachInput','totalOutreachValue','dw_totalOutreach',total,dwNumber);
-  const conversionText = responses + ' / ' + dwPercent(rate);
+  const conversionText = "0%";
   const conversionInput = document.getElementById('conversionRateInput');
   const conversionValue = document.getElementById('conversionRateValue');
   if(conversionInput) conversionInput.value = conversionText;
@@ -4997,7 +5868,7 @@ const DW_APPROVED_LOCKED_METRICS = {
   totalRevenue: 56307.80,
   sfLeasedSold: 10798,
   listings: 5,
-  totalOutreach: 2,
+  totalOutreach:0,
   responses: 1,
   conversionRate: 50,
   liveTransactions: 13,
@@ -5846,6 +6717,312 @@ function dwAddProspectsFromSelectedLane(){
   }
 }
 
+
+// =====================================================
+// WEEKLY FOLLOW-UP SEQUENCE UPGRADE — 05/18/2026
+// Safe overlay only. Does not change design, metrics, CRM sync, or templates.
+// Sequence: Touch 1 -> Follow Up 1-6 -> Walk In -> Research Contact -> Restart.
+// Every step is scheduled 7 days apart and written into the Follow Ups tab.
+// =====================================================
+const DW_WEEKLY_FOLLOWUP_DAYS = 7;
+const DW_SEQUENCE_LABELS = {
+  0: "Touch 1",
+  1: "Follow Up 1",
+  2: "Follow Up 2",
+  3: "Follow Up 3",
+  4: "Follow Up 4",
+  5: "Follow Up 5",
+  6: "Follow Up 6",
+  7: "Walk In",
+  8: "Research Contact"
+};
+
+function dwISOPlusDays(days){
+  const d = new Date(todayISO() + "T00:00:00");
+  d.setDate(d.getDate() + Number(days || 0));
+  return d.toISOString().split("T")[0];
+}
+
+function dwNextSequenceLabelFromCompletedTouch(touchCount){
+  const n = Number(touchCount || 0);
+  if(n <= 0) return "Touch 1";
+  if(n >= 1 && n <= 6) return "Follow Up " + n;
+  if(n === 7) return "Walk In";
+  if(n === 8) return "Research Contact";
+  return "Touch 1";
+}
+
+function dwCompletedSequenceLabel(touchCount){
+  const n = Number(touchCount || 0);
+  if(n <= 1) return "Touch 1";
+  if(n >= 2 && n <= 7) return "Follow Up " + (n - 1);
+  if(n === 8) return "Walk In";
+  if(n === 9) return "Research Contact";
+  return "Touch 1";
+}
+
+function dwSequenceStateAfterCompletion(currentTouchCount){
+  const completedCount = Number(currentTouchCount || 0) + 1;
+  const completedAction = dwCompletedSequenceLabel(completedCount);
+
+  if(completedCount >= 9){
+    return {
+      completedTouchCount: completedCount,
+      storedTouchCount: 0,
+      nextFollowupDate: dwISOPlusDays(DW_WEEKLY_FOLLOWUP_DAYS),
+      completedAction,
+      nextAction: "Touch 1",
+      stage: "Research",
+      strategy: "coldIntro",
+      emailTouch: "First Outreach",
+      noteSuffix: "Research Contact completed. Restart sequence in 7 days with Touch 1."
+    };
+  }
+
+  const nextAction = dwNextSequenceLabelFromCompletedTouch(completedCount);
+  let stage = "Follow-Up";
+  let strategy = "followUp";
+  let emailTouch = nextAction;
+
+  if(nextAction === "Walk In"){
+    stage = "Walk In";
+    strategy = "researchLead";
+    emailTouch = "Walk In";
+  } else if(nextAction === "Research Contact"){
+    stage = "Research";
+    strategy = "researchLead";
+    emailTouch = "Research Contact";
+  } else if(nextAction === "Touch 1"){
+    stage = "New";
+    strategy = "coldIntro";
+    emailTouch = "First Outreach";
+  }
+
+  return {
+    completedTouchCount: completedCount,
+    storedTouchCount: completedCount,
+    nextFollowupDate: dwISOPlusDays(DW_WEEKLY_FOLLOWUP_DAYS),
+    completedAction,
+    nextAction,
+    stage,
+    strategy,
+    emailTouch,
+    noteSuffix: `${completedAction} completed. ${nextAction} scheduled in 7 days.`
+  };
+}
+
+// Replace old 2/3/5/monthly nurture cadence with exact weekly cadence.
+nextFollowUpForTouch = function(){
+  return new Date(dwISOPlusDays(DW_WEEKLY_FOLLOWUP_DAYS) + "T00:00:00");
+};
+
+followUpLabelForTouch = function(touchCount){
+  const state = dwSequenceStateAfterCompletion(Number(touchCount || 0) - 1);
+  return `${state.completedAction} complete — ${state.nextAction} in 7 days`;
+};
+
+followUpActionForProspect = function(p){
+  const nextAction = dwNextSequenceLabelFromCompletedTouch(Number(p?.touchCount || 0));
+  if(nextAction === "Touch 1") return "Touch 1: restart the sequence with the best contact you have, or use the new contact found during research.";
+  if(nextAction.startsWith("Follow Up")) return `${nextAction}: send the next follow-up from the existing draft strategy sequence.`;
+  if(nextAction === "Walk In") return "Walk In: visit the building/company in person and try to identify or confirm the right decision-maker.";
+  if(nextAction === "Research Contact") return "Research Contact: find a new/better contact, update the CRM, then restart the sequence.";
+  return "Continue outreach sequence.";
+};
+
+function dwApplySequenceToQueueAndProspect(item, prospect, outcome, noteText){
+  const currentTouches = Number(prospect?.touchCount || item.touchCount || 0);
+  const state = dwSequenceStateAfterCompletion(currentTouches);
+  const now = new Date();
+  const completedDate = todayISO();
+
+  item.status = "Completed";
+  item.outcome = outcome || "Outreach Completed";
+  item.completedNote = noteText || state.noteSuffix;
+  item.completedAt = now.toISOString();
+  item.touchCount = state.completedTouchCount;
+  item.completedAction = state.completedAction;
+  item.nextAction = state.nextAction;
+  item.nextFollowupDate = state.nextFollowupDate;
+  item.emailTouch = state.emailTouch;
+  item.strategy = state.strategy;
+
+  if(prospect){
+    prospect.stage = state.stage;
+    prospect.lastContacted = completedDate;
+    prospect.touchCount = state.storedTouchCount;
+    prospect.followupDate = state.nextFollowupDate;
+    prospect.nextStep = state.nextAction;
+    prospect.strategy = state.strategy;
+    prospect.emailTouch = state.emailTouch;
+    prospect.notes = [
+      `${now.toLocaleString()} — ${outcome || "Outreach Completed"}: ${noteText || state.noteSuffix}. Next: ${state.nextAction} on ${state.nextFollowupDate}.`,
+      prospect.notes || ""
+    ].filter(Boolean).join("\n\n");
+  }
+
+  return state;
+}
+
+function dwRefreshOutreachPanels(){
+  Brain.save();
+  refreshAll();
+  const tableSlot = document.getElementById("outreachTableSlot");
+  if(tableSlot) tableSlot.innerHTML = outreachTableHTML();
+  const topSlot = document.getElementById("topFiveOutreachSlot");
+  if(topSlot) topSlot.innerHTML = topFiveOutreachHTML();
+  const agendaSlot = document.getElementById("agendaSectionsSlot");
+  if(agendaSlot) agendaSlot.innerHTML = agendaSectionsHTML();
+  const completedSlot = document.getElementById("completedOutreachLogSlot");
+  if(completedSlot) completedSlot.innerHTML = completedOutreachLogHTML();
+  const followSlot = document.getElementById("followUpQueueSlot");
+  if(followSlot) followSlot.innerHTML = followUpQueueHTML();
+  const pipelineSlot = document.getElementById("pipelineBucketsSlot");
+  if(pipelineSlot) pipelineSlot.innerHTML = pipelineBucketsHTML();
+}
+
+writeBackCompletedOutreach = async function(item, prospect, noteText, outcome, nextDate, touchCount, sequenceState){
+  const state = sequenceState || {
+    completedAction: dwCompletedSequenceLabel(touchCount),
+    nextAction: dwNextSequenceLabelFromCompletedTouch(touchCount),
+    storedTouchCount: Number(prospect?.touchCount || touchCount || 0),
+    nextFollowupDate: nextDate || ""
+  };
+
+  const p = Object.assign({}, prospect || {}, {
+    id: (prospect && prospect.id) || item.prospectId || item.id,
+    sourceTab: "Follow Ups",
+    agenda: "Follow Ups",
+    company: (prospect && prospect.company) || item.company || "",
+    property: (prospect && (prospect.property || prospect.address)) || item.property || "",
+    contact: (prospect && prospect.contact) || item.contact || "",
+    email: (prospect && prospect.email) || item.contactEmail || "",
+    phone: (prospect && prospect.phone) || item.contactPhone || "",
+    stage: state.nextAction === "Walk In" ? "Walk In" : state.nextAction === "Research Contact" ? "Research" : "Follow-Up",
+    nextStep: state.nextAction,
+    followupDate: state.nextFollowupDate || nextDate || "",
+    touchCount: state.storedTouchCount
+  });
+
+  return writeBackToGoogleSheet(p, {
+    sourceTab: "Follow Ups",
+    originalSourceTab: prospect?.sourceTab || item.source || item.sourceType || "",
+    outcome: outcome || "Outreach Completed",
+    note: noteText || state.noteSuffix || "Outreach completed from dashboard.",
+    completedAction: state.completedAction,
+    nextAction: state.nextAction,
+    stage: p.stage,
+    nextStep: state.nextAction,
+    nextFollowUp: state.nextFollowupDate || nextDate || "",
+    touchCount: state.storedTouchCount,
+    completedTouchCount: state.completedTouchCount || touchCount || 0,
+    lastContacted: todayISO()
+  });
+};
+
+completeOutreachAndScheduleNext = async function(id){
+  const item = Brain.outreachQueue.find(q => q.id === id);
+  if(!item) return;
+
+  setQueueContact(id);
+  const prospect = Brain.prospects.find(p => p.id === item.prospectId);
+  const state = dwApplySequenceToQueueAndProspect(item, prospect, "Outreach Completed", "Outreach completed from Outreach Queue");
+  Brain.completedOutreach.unshift({...item, completedDate: todayISO()});
+  Brain.tasks = Brain.tasks.map(t => t.id === "task_" + id ? {...t, status:"Done"} : t);
+  dwRefreshOutreachPanels();
+
+  try {
+    await writeBackCompletedOutreach(item, prospect, item.completedNote, "Outreach Completed", state.nextFollowupDate, state.completedTouchCount, state);
+    alert(`${state.completedAction} completed. ${state.nextAction} scheduled for ${state.nextFollowupDate} and saved to the Follow Ups tab.`);
+  } catch(err){
+    console.error(err);
+    alert(`${state.completedAction} completed locally, but Follow Ups write-back failed: ${err.message}`);
+  }
+};
+
+saveCRMUpdateFromModal = async function(){
+  const btn = event && event.target ? event.target : null;
+  if(btn){ btn.disabled = true; btn.textContent = "Saving..."; }
+
+  try {
+    const id = modalQueueId.value;
+    const item = Brain.outreachQueue.find(q => q.id === id);
+    if(!item){
+      alert("Could not find this outreach item. Refresh the page and try again.");
+      return;
+    }
+
+    setQueueContact(id);
+    const noteText = modalNote.value || "Dashboard note saved.";
+    const outcome = modalOutcome.value || "Outreach";
+    const prospect = Brain.prospects.find(p => p.id === item.prospectId);
+    const state = dwApplySequenceToQueueAndProspect(item, prospect, outcome, noteText);
+
+    // Respect a manually edited date if Connor changes it, but default remains exactly +7 days.
+    if(modalFollowupDate.value){
+      state.nextFollowupDate = modalFollowupDate.value;
+      item.nextFollowupDate = state.nextFollowupDate;
+      if(prospect) prospect.followupDate = state.nextFollowupDate;
+    }
+
+    if(prospect && document.getElementById("modalAddHot")?.checked){
+      prospect.tags = Array.isArray(prospect.tags) ? prospect.tags : [];
+      if(!prospect.tags.includes("hot prospect")) prospect.tags.push("hot prospect");
+    }
+
+    Brain.completedOutreach.unshift({...item, completedDate: todayISO()});
+    Brain.tasks = Brain.tasks.map(t => t.id === "task_" + id ? {...t, status:"Done"} : t);
+    Brain.save();
+
+    const writeResult = await writeBackCompletedOutreach(item, prospect, noteText, outcome, state.nextFollowupDate, state.completedTouchCount, state);
+
+    closeNoteModal();
+    openApp("outreach");
+    alert(`${state.completedAction} saved. ${state.nextAction} is scheduled for ${state.nextFollowupDate} in the Follow Ups tab.`);
+    console.log("Follow Ups write-back success:", writeResult);
+
+  } catch(err){
+    console.error("Save update failed:", err);
+    alert("Save update failed: " + (err && err.message ? err.message : String(err)));
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = "Save Update + Complete Action"; }
+  }
+};
+
+openCRMUpdateModal = function(id){
+  modalQueueId.value = id;
+  modalOutcome.value = "Email sent";
+
+  const q = Brain.outreachQueue.find(x => x.id === id);
+  const prospect = q ? Brain.prospects.find(p => p.id === q.prospectId) : null;
+  const state = dwSequenceStateAfterCompletion(Number(prospect?.touchCount || q?.touchCount || 0));
+  modalFollowupDate.value = state.nextFollowupDate;
+  modalNote.value = q ? `${state.completedAction} completed. ${state.nextAction} scheduled in 7 days.` : "";
+  if(document.getElementById("modalAddHot")) modalAddHot.checked = false;
+  noteModal.style.display = "flex";
+};
+
+// Make due follow-ups display the correct next step in the existing dropdown without changing templates.
+const dwOriginalOutreachTableRowHTML_WeeklySequence = outreachTableRowHTML;
+outreachTableRowHTML = function(q){
+  const p = Brain.prospects.find(x=>x.id===q.prospectId) || {};
+  const nextLabel = dwNextSequenceLabelFromCompletedTouch(Number(p.touchCount || q.touchCount || 0));
+  q.emailTouch = q.emailTouch || (nextLabel === "Touch 1" ? "First Outreach" : nextLabel);
+  if(nextLabel === "Walk In") q.emailStrategy = q.emailStrategy || "Research Contact";
+  if(nextLabel === "Research Contact") q.emailStrategy = q.emailStrategy || "Research Contact";
+  return dwOriginalOutreachTableRowHTML_WeeklySequence(q);
+};
+
+</script>
+
+<script>
+window.addEventListener("load", function(){
+  const cv = document.getElementById("conversionRateValue");
+  const ci = document.getElementById("conversionRateInput");
+  if(cv) cv.textContent = "0%";
+  if(ci) ci.value = "0%";
+});
 </script>
 </body>
+
 </html>
