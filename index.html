@@ -3863,13 +3863,7 @@ const DAILY_WEAPON_BRIDGE_URL = "https://script.google.com/macros/s/AKfycbzfmwqp
 let liveSyncInProgress = false;
 
 function getCRMBridgeUrl(){
-  const stored = String((Brain && Brain.crmSourcePath) || localStorage.getItem("dw_crmSourcePath") || "").trim();
-  if(stored.includes("script.google.com/macros/s/") && stored.includes("/exec")){
-    return stored;
-  }
-  Brain.crmSourcePath = DAILY_WEAPON_BRIDGE_URL;
-  localStorage.setItem("dw_crmSourcePath", DAILY_WEAPON_BRIDGE_URL);
-  return DAILY_WEAPON_BRIDGE_URL;
+  return "https://script.google.com/macros/s/AKfycbyIMaMR0mX_SasW8Cv1_ECdeBbDd1BBF-KdY1f6X8tLLqFjAq0jYatdOn4HmVJKrYkhZg/exec";
 }
 
 function metricNumber(v){
@@ -3946,12 +3940,13 @@ function loadBridgeDataJSONP(){
 
 function bridgeJSONP(action, params){
   return new Promise((resolve, reject) => {
-    const callbackName = "dwWriteCallback_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    const callbackName = "dwCallback_" + Date.now() + "_" + Math.random().toString(36).slice(2);
     const script = document.createElement("script");
+
     const timeout = setTimeout(() => {
       cleanup();
-      reject(new Error("Apps Script write-back did not respond."));
-    }, 15000);
+      reject(new Error("Apps Script write-back timed out."));
+    }, 20000);
 
     function cleanup(){
       clearTimeout(timeout);
@@ -3970,9 +3965,17 @@ function bridgeJSONP(action, params){
     };
 
     const bridgeUrl = getCRMBridgeUrl();
-    const query = new URLSearchParams({ action, callback: callbackName, t: String(Date.now()) });
-    Object.keys(params || {}).forEach(k => query.set(k, params[k]));
-    script.src = bridgeUrl + (bridgeUrl.includes("?") ? "&" : "?") + query.toString();
+
+    let url = bridgeUrl + (bridgeUrl.includes("?") ? "&" : "?");
+    url += "action=" + encodeURIComponent(action);
+    url += "&callback=" + encodeURIComponent(callbackName);
+    url += "&t=" + Date.now();
+
+    Object.keys(params || {}).forEach(function(key){
+      url += "&" + encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+    });
+
+    script.src = url;
     document.body.appendChild(script);
   });
 }
@@ -3998,11 +4001,18 @@ function prospectWriteBackPayload(prospect, extra){
 async function writeBackToGoogleSheet(prospect, extra){
   const payload = prospectWriteBackPayload(prospect, extra);
   const encoded = encodeURIComponent(JSON.stringify(payload));
-  const res = await bridgeJSONP("writeback", { payload: encoded });
-  if(!res || res.success === false){
-    throw new Error((res && res.error) || "Write-back failed.");
+
+  const result = await bridgeJSONP("writeback", {
+    payload: encoded
+  });
+
+  if(!result || result.success === false){
+    throw new Error(
+      (result && result.error) || "Write-back failed."
+    );
   }
-  return res;
+
+  return result;
 }
 
 async function quickCRMWriteBack(prospectId, type){
@@ -4421,10 +4431,9 @@ async function loadAllCRMTabsFromGoogle(options){
     ];
 
     Brain.outreachQueue = [];
-    Brain.tasks = [];
-    Brain.save();
-    generateDailyCommandQueue();
-    syncAllDashboardMetrics(tabs);
+Brain.tasks = [];
+Brain.save();
+dwForceBuildOutreachFromProspects();
 
     const stamp = new Date().toLocaleString();
     localStorage.setItem("dw_lastLiveSync", stamp);
@@ -5149,31 +5158,59 @@ renderOutreach = function(){
 
 function dwForceBuildOutreachFromProspects(){
   const today = todayISO();
-  const activeExisting = (Brain.outreachQueue || []).filter(q => q.status !== 'Completed');
+
+  const completedKeys = new Set(
+    (Brain.completedOutreach || []).map(q =>
+      normalize([
+        q.company || "",
+        q.property || "",
+        q.prospectId || ""
+      ].join(" "))
+    )
+  );
+
+  const activeExisting = (Brain.outreachQueue || []).filter(q => q.status !== "Completed");
   if(activeExisting.length) return;
+
   const rows = (Brain.prospects || [])
-    .filter(p => p && p.stage !== 'Deal')
+    .filter(p => p && p.stage !== "Deal")
+    .filter(p => {
+      const key = normalize([
+        p.company || p.owner || "",
+        p.property || p.address || p.market || "",
+        p.id || ""
+      ].join(" "));
+      return !completedKeys.has(key);
+    })
     .sort((a,b) => priorityScore(b,null) - priorityScore(a,null))
     .slice(0, 20);
+
   Brain.outreachQueue = rows.map((p, i) => ({
-    id:'q_livecrm_' + today + '_' + (p.id || i),
+    id:"q_livecrm_" + today + "_" + (p.id || i),
     date:today,
     actionDate:today,
-    company:p.company || p.owner || 'Unnamed Prospect',
-    property:p.property || p.address || p.market || '',
-    contact:p.contact || '',
-    prospectId:p.id || ('live_' + i),
-    signalId:'',
-    sourceType:p.followupDate === today ? 'Follow-Up' : 'Daily Outreach',
+    company:p.company || p.owner || "Unnamed Prospect",
+    property:p.property || p.address || p.market || "",
+    contact:p.contact || "",
+    prospectId:p.id || ("live_" + i),
+    signalId:"",
+    sourceType:p.followupDate === today ? "Follow-Up" : "Daily Outreach",
     strategy:pickStrategy(p, null),
     reason:reasonForOutreach(p, null),
-    source:p.sourceTab || p.agenda || 'Live CRM',
-    sourceUrl:'',
+    source:p.sourceTab || p.agenda || "Live CRM",
+    sourceUrl:"",
     matchScore:priorityScore(p,null) || (100 - i),
-    status:'Open',
-    suggestedTask:p.nextStep || 'Start outreach'
+    status:"Open",
+    suggestedTask:p.nextStep || "Start outreach"
   }));
-  Brain.tasks = Brain.outreachQueue.map(q => ({id:'task_' + q.id, task:`${q.company}: ${STRATEGIES[q.strategy] || q.strategy} — ${q.suggestedTask}`, owner:'Outreach Agent', status:q.status}));
+
+  Brain.tasks = Brain.outreachQueue.map(q => ({
+    id:"task_" + q.id,
+    task:`${q.company}: ${STRATEGIES[q.strategy] || q.strategy} — ${q.suggestedTask}`,
+    owner:"Outreach Agent",
+    status:q.status
+  }));
+
   Brain.save();
 }
 
@@ -7012,6 +7049,148 @@ outreachTableRowHTML = function(q){
   if(nextLabel === "Research Contact") q.emailStrategy = q.emailStrategy || "Research Contact";
   return dwOriginalOutreachTableRowHTML_WeeklySequence(q);
 };
+
+
+// =====================================================
+// FINAL OUTREACH DEDUPE PATCH — blocks completed prospects from rebuilding
+// This does not change design, metrics, templates, or Google Sheet connection.
+// It only prevents a completed company/address from reappearing in the active Outreach Queue.
+// =====================================================
+(function(){
+  function safeParseCompletedKeys(){
+    try { return JSON.parse(localStorage.getItem('dw_completedOutreachKeys') || '[]'); }
+    catch(e){ return []; }
+  }
+
+  window.dwOutreachBlockKeyParts = function(obj){
+    obj = obj || {};
+    const company = obj.company || obj.owner || obj['Tenant Company'] || obj.Company || '';
+    const property = obj.property || obj.address || obj.Address || obj.market || obj.Property || '';
+    const id = obj.prospectId || obj.id || '';
+    const email = obj.email || obj.contactEmail || obj.Email || '';
+    const parts = [];
+    if(company && property) parts.push('company_property|' + normalize(company + '|' + property));
+    if(company) parts.push('company|' + normalize(company));
+    if(property) parts.push('property|' + normalize(property));
+    if(email) parts.push('email|' + normalize(email));
+    if(id) parts.push('id|' + normalize(id));
+    return [...new Set(parts.filter(Boolean))];
+  };
+
+  window.dwRememberCompletedOutreach = function(item, prospect){
+    const existing = safeParseCompletedKeys();
+    const keys = [
+      ...dwOutreachBlockKeyParts(item),
+      ...dwOutreachBlockKeyParts(prospect)
+    ];
+    const merged = [...new Set([...existing, ...keys])];
+    localStorage.setItem('dw_completedOutreachKeys', JSON.stringify(merged));
+    return merged;
+  };
+
+  window.dwIsBlockedOutreach = function(obj){
+    const blocked = new Set(safeParseCompletedKeys());
+
+    // Also rebuild the block list from Brain.completedOutreach every time, in case localStorage was saved earlier.
+    (Brain.completedOutreach || []).forEach(done => {
+      dwOutreachBlockKeyParts(done).forEach(k => blocked.add(k));
+    });
+
+    return dwOutreachBlockKeyParts(obj).some(k => blocked.has(k));
+  };
+
+  window.dwFilterBlockedOutreachQueue = function(){
+    Brain.outreachQueue = (Brain.outreachQueue || []).filter(q => q && q.status !== 'Completed' && !dwIsBlockedOutreach(q));
+    Brain.tasks = (Brain.tasks || []).filter(t => {
+      const qid = String(t.id || '').replace(/^task_/, '');
+      const q = (Brain.outreachQueue || []).find(x => x.id === qid);
+      return !qid || q;
+    });
+    Brain.save();
+  };
+
+  if(typeof completeOutreachAndScheduleNext === 'function'){
+    const originalCompleteOutreachAndScheduleNext = completeOutreachAndScheduleNext;
+    completeOutreachAndScheduleNext = async function(id){
+      const item = (Brain.outreachQueue || []).find(q => q.id === id);
+      const prospect = item ? (Brain.prospects || []).find(p => p.id === item.prospectId) : null;
+      if(item) dwRememberCompletedOutreach(item, prospect);
+      const result = await originalCompleteOutreachAndScheduleNext(id);
+      if(item) dwRememberCompletedOutreach(item, prospect);
+      dwFilterBlockedOutreachQueue();
+      if(document.getElementById('outreachTableSlot')) document.getElementById('outreachTableSlot').innerHTML = outreachTableHTML();
+      return result;
+    };
+  }
+
+  if(typeof saveCRMUpdateFromModal === 'function'){
+    const originalSaveCRMUpdateFromModal = saveCRMUpdateFromModal;
+    saveCRMUpdateFromModal = async function(){
+      const id = document.getElementById('modalQueueId')?.value || '';
+      const item = (Brain.outreachQueue || []).find(q => q.id === id);
+      const prospect = item ? (Brain.prospects || []).find(p => p.id === item.prospectId) : null;
+      if(item) dwRememberCompletedOutreach(item, prospect);
+      const result = await originalSaveCRMUpdateFromModal();
+      if(item) dwRememberCompletedOutreach(item, prospect);
+      dwFilterBlockedOutreachQueue();
+      return result;
+    };
+  }
+
+  if(typeof generateDailyCommandQueue === 'function'){
+    const originalGenerateDailyCommandQueue = generateDailyCommandQueue;
+    generateDailyCommandQueue = function(){
+      const result = originalGenerateDailyCommandQueue();
+      dwFilterBlockedOutreachQueue();
+      return result;
+    };
+  }
+
+  if(typeof dwForceBuildOutreachFromProspects === 'function'){
+    const originalDwForceBuildOutreachFromProspects = dwForceBuildOutreachFromProspects;
+    dwForceBuildOutreachFromProspects = function(){
+      // Remove blocked prospects before the builder sees them.
+      const originalProspects = Brain.prospects || [];
+      Brain.prospects = originalProspects.filter(p => !dwIsBlockedOutreach(p));
+      const result = originalDwForceBuildOutreachFromProspects();
+      Brain.prospects = originalProspects;
+      dwFilterBlockedOutreachQueue();
+      return result;
+    };
+  }
+
+  if(typeof dwBuildOutreachQueueFromProspects === 'function'){
+    const originalDwBuildOutreachQueueFromProspects = dwBuildOutreachQueueFromProspects;
+    dwBuildOutreachQueueFromProspects = function(limit){
+      const originalProspects = Brain.prospects || [];
+      Brain.prospects = originalProspects.filter(p => !dwIsBlockedOutreach(p));
+      const result = originalDwBuildOutreachQueueFromProspects(limit);
+      Brain.prospects = originalProspects;
+      dwFilterBlockedOutreachQueue();
+      return result;
+    };
+  }
+
+  if(typeof dwAddProspectsFromSelectedLane === 'function'){
+    const originalDwAddProspectsFromSelectedLane = dwAddProspectsFromSelectedLane;
+    dwAddProspectsFromSelectedLane = function(){
+      const originalProspects = Brain.prospects || [];
+      Brain.prospects = originalProspects.filter(p => !dwIsBlockedOutreach(p));
+      const result = originalDwAddProspectsFromSelectedLane();
+      Brain.prospects = originalProspects;
+      dwFilterBlockedOutreachQueue();
+      return result;
+    };
+  }
+
+  if(typeof outreachTableHTML === 'function'){
+    const originalOutreachTableHTML = outreachTableHTML;
+    outreachTableHTML = function(){
+      dwFilterBlockedOutreachQueue();
+      return originalOutreachTableHTML();
+    };
+  }
+})();
 
 </script>
 
